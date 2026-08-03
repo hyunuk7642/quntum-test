@@ -88,7 +88,22 @@
   .gnav-links{ display:flex; gap:1.15rem; }
   .gnav-links a{ color:#f5f5f7; font-size:.72rem; text-decoration:none; opacity:.78; transition:opacity .15s; white-space:nowrap; }
   .gnav-links a:hover{ opacity:1; }
-  @media (max-width:760px){ .gnav-links{ display:none; } }
+  .gnav-toggle{ display:none; background:none; border:none; color:#f5f5f7; font-size:1.15rem; line-height:1; cursor:pointer; padding:.3em .2em; }
+  @media (max-width:760px){
+    .gnav-links{ display:none; }
+    .gnav-toggle{ display:inline-flex; align-items:center; justify-content:center; }
+  }
+  .gnav-mobile{
+    position:fixed; top:44px; left:0; right:0; z-index:109; background:#000;
+    border-top:1px solid rgba(255,255,255,.12); padding:.3rem clamp(1.1rem,4vw,2.5rem) .8rem;
+    display:flex; flex-direction:column;
+  }
+  .gnav-mobile[hidden]{ display:none; }
+  .gnav-mobile a{
+    color:#f5f5f7; text-decoration:none; font-size:.92rem; opacity:.85;
+    padding:.75em 0; border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .gnav-mobile a:last-child{ border-bottom:none; }
 
   /* ---------- 사이드 네비(프로스티드 캡슐) ---------- */
   .navdots{
@@ -262,10 +277,14 @@
     <div class="gnav-links">
       <a href="#s1">도입</a><a href="#s2">큐비트</a><a href="#s3">이중슬릿</a><a href="#s4">얽힘</a><a href="#s5">해석 논쟁</a><a href="#s6">기술과 사회</a>
     </div>
+    <button class="gnav-toggle" id="gnavToggle" aria-expanded="false" aria-controls="gnavMobile" aria-label="섹션 메뉴 열기">☰</button>
+  </div>
+  <div class="gnav-mobile" id="gnavMobile" hidden>
+    <a href="#s1">01 · 도입</a><a href="#s2">02 · 큐비트</a><a href="#s3">03 · 이중슬릿</a><a href="#s4">04 · 얽힘</a><a href="#s5">05 · 해석 논쟁</a><a href="#s6">06 · 기술과 사회</a>
   </div>
 </nav>
 
-<div class="navdots" id="navdots" aria-hidden="true">
+<div class="navdots" id="navdots" aria-label="섹션 바로가기">
   <a href="#s1" data-tip="01 · 도입"><span class="tip">01 도입</span></a>
   <a href="#s2" data-tip="02 · 큐비트"><span class="tip">02 큐비트</span></a>
   <a href="#s3" data-tip="03 · 이중슬릿"><span class="tip">03 이중슬릿</span></a>
@@ -969,6 +988,31 @@
   /* ================= 유틸 ================= */
   function debounce(fn, ms){
     var t; return function(){ clearTimeout(t); var args=arguments, ctx=this; t=setTimeout(function(){ fn.apply(ctx,args); }, ms); };
+  }
+
+  /* ================= 모바일 상단 메뉴 ================= */
+  var gnavToggle = document.getElementById("gnavToggle");
+  var gnavMobile = document.getElementById("gnavMobile");
+  if (gnavToggle && gnavMobile){
+    function closeGnavMobile(){
+      gnavMobile.hidden = true;
+      gnavToggle.setAttribute("aria-expanded", "false");
+      gnavToggle.textContent = "☰";
+      gnavToggle.setAttribute("aria-label", "섹션 메뉴 열기");
+    }
+    gnavToggle.addEventListener("click", function(){
+      var willOpen = gnavMobile.hidden;
+      gnavMobile.hidden = !willOpen;
+      gnavToggle.setAttribute("aria-expanded", String(willOpen));
+      gnavToggle.textContent = willOpen ? "✕" : "☰";
+      gnavToggle.setAttribute("aria-label", willOpen ? "섹션 메뉴 닫기" : "섹션 메뉴 열기");
+    });
+    Array.prototype.forEach.call(gnavMobile.querySelectorAll("a"), function(a){
+      a.addEventListener("click", closeGnavMobile);
+    });
+    window.addEventListener("resize", debounce(function(){
+      if (window.innerWidth > 760) closeGnavMobile();
+    }, 200));
   }
 
   /* ================= 사이드 네비 활성화 ================= */
