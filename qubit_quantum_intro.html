@@ -1,0 +1,989 @@
+<meta charset="utf-8" />
+<title>큐비트와 양자컴퓨팅 탐구</title>
+<meta name="description" content="고등학교 물리 Ⅲ. 양자와 미시 세계 — 중첩과 측정, 큐비트, 이중슬릿, 얽힘을 직접 조작하며 배우는 인터랙티브 학습지" />
+<style>
+  /* ---------- 토큰 (Apple 디자인 언어: 단일 Action Blue 액센트 + 명암 교차 타일) ---------- */
+  :root{
+    --primary:#0066cc;
+    --primary-focus:#0071e3;
+    --primary-on-dark:#2997ff;
+    --hairline-light:rgba(0,0,0,.08);
+    --hairline-dark:rgba(255,255,255,.14);
+
+    --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    --font-display:var(--font-body);
+    --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,"Noto Sans Mono CJK KR",monospace;
+
+    --scope-bg:#0a0f1a;
+    --scope-grid:rgba(255,255,255,.07);
+    --scope-teal:#45d6c6;
+    --scope-violet:#a394f2;
+    --scope-amber:#ffb648;
+    --scope-text:#cfe0ee;
+    --scope-dim:#5c6e86;
+    --measure:#b5720c;
+    --measure-soft:rgba(181,114,12,.14);
+
+    --radius:18px;
+    --radius-sm:10px;
+    --maxw:1160px;
+    --shadow:0 1px 2px rgba(20,30,45,.06), 0 10px 28px -14px rgba(20,30,45,.20);
+    background:#f5f5f7;
+  }
+
+  /* 세 가지 타일 톤 — Apple 특유의 "색이 곧 구획선" 원칙에 따라 항상 고정된 명암을 가짐 */
+  .tile-light{
+    --bg:#ffffff; --surface:#ffffff; --surface-2:#f5f5f7; --bg-soft:#f5f5f7; --border:#e0e0e0;
+    --text:#1d1d1f; --text-soft:#48484a; --text-faint:#7a7a7a;
+    --c0:var(--primary); --c0-soft:rgba(0,102,204,.08); --focus:var(--primary-focus);
+  }
+  .tile-parchment{
+    --bg:#f5f5f7; --surface:#ffffff; --surface-2:#fafafc; --bg-soft:#fafafc; --border:#e0e0e0;
+    --text:#1d1d1f; --text-soft:#48484a; --text-faint:#7a7a7a;
+    --c0:var(--primary); --c0-soft:rgba(0,102,204,.08); --focus:var(--primary-focus);
+  }
+  .tile-dark{
+    --bg:#272729; --surface:#2a2a2c; --surface-2:#323234; --bg-soft:#323234; --border:rgba(255,255,255,.14);
+    --text:#ffffff; --text-soft:#cccccc; --text-faint:#98989d;
+    --c0:var(--primary-on-dark); --c0-soft:rgba(41,151,255,.16); --focus:var(--primary-on-dark);
+  }
+  .tile-dark-2{
+    --bg:#2a2a2c; --surface:#323234; --surface-2:#3a3a3c; --bg-soft:#3a3a3c; --border:rgba(255,255,255,.14);
+    --text:#ffffff; --text-soft:#cccccc; --text-faint:#98989d;
+    --c0:var(--primary-on-dark); --c0-soft:rgba(41,151,255,.16); --focus:var(--primary-on-dark);
+  }
+  .tile{ background:var(--bg); color:var(--text); }
+
+  *{box-sizing:border-box;}
+  html{color-scheme:light dark;}
+  body{
+    margin:0; background:#f5f5f7; color:#1d1d1f;
+    font-family:var(--font-body); line-height:1.5; font-size:17px;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    padding-top:44px;
+  }
+  @media (prefers-color-scheme: dark){ body{ background:#000; } }
+  :root[data-theme="dark"] body{ background:#000; }
+  ::selection{ background:rgba(0,102,204,.18); }
+  h1,h2,h3{ font-family:var(--font-display); text-wrap:balance; font-weight:600; margin:0; }
+  p{ margin:0; }
+  a{ color:inherit; }
+  button, input, textarea{ font-family:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; border-radius:4px; }
+  .tabular{ font-variant-numeric:tabular-nums; }
+
+  .page{ max-width:var(--maxw); margin:0 auto; padding:clamp(2.6rem,6vw,4.2rem) clamp(1.1rem,4vw,2.5rem); }
+  .page.hero{ padding-top:clamp(3.2rem,8vw,5.5rem); padding-bottom:clamp(2.6rem,6vw,4rem); }
+  .eyebrow{
+    font-family:var(--font-body); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--c0); display:flex; align-items:center; gap:.6em; font-weight:600;
+  }
+  .eyebrow::before{ content:""; width:1.4em; height:1px; background:var(--c0); display:inline-block; }
+
+  /* ---------- 상단 글로벌 내비 (Apple global-nav) ---------- */
+  .gnav{ position:fixed; top:0; left:0; right:0; height:44px; background:#000; z-index:110; }
+  .gnav-inner{ max-width:var(--maxw); margin:0 auto; height:100%; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(1.1rem,4vw,2.5rem); gap:1rem; }
+  .gnav-brand{ color:#f5f5f7; font-size:.8rem; font-weight:600; letter-spacing:-.005em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gnav-links{ display:flex; gap:1.15rem; }
+  .gnav-links a{ color:#f5f5f7; font-size:.72rem; text-decoration:none; opacity:.78; transition:opacity .15s; white-space:nowrap; }
+  .gnav-links a:hover{ opacity:1; }
+  @media (max-width:760px){ .gnav-links{ display:none; } }
+
+  /* ---------- 사이드 네비(프로스티드 캡슐) ---------- */
+  .navdots{
+    position:fixed; right:1.1rem; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:.85rem; z-index:100;
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3);
+    -webkit-backdrop-filter:blur(14px) saturate(160%); backdrop-filter:blur(14px) saturate(160%);
+    border-radius:999px; padding:.8rem .55rem; box-shadow:0 4px 18px rgba(0,0,0,.14);
+  }
+  .navdots a{
+    width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.55);
+    display:block; position:relative; text-decoration:none;
+    transition:background .15s, transform .15s;
+  }
+  .navdots a.active{ background:var(--primary-on-dark); transform:scale(1.35); }
+  .navdots a .tip{
+    position:absolute; right:150%; top:50%; transform:translateY(-50%);
+    font-size:.68rem; white-space:nowrap;
+    background:rgba(0,0,0,.78); color:#fff; padding:.3em .65em; border-radius:6px;
+    opacity:0; pointer-events:none; transition:opacity .15s;
+  }
+  .navdots a:hover .tip, .navdots a:focus-visible .tip{ opacity:1; }
+  @media (max-width:900px){ .navdots{ display:none; } }
+
+  /* ---------- 섹션 공통 ---------- */
+  .unit-head{ margin-bottom:1.8rem; max-width:70ch; }
+  .unit-head h2{ font-size:clamp(1.5rem,3.2vw,2.05rem); margin-top:.5rem; letter-spacing:-.012em; }
+  .unit-head .lede{ color:var(--text-soft); margin-top:.8rem; font-size:1rem; }
+  .grid2{
+    display:grid; grid-template-columns:minmax(280px,1fr) minmax(340px,1.15fr);
+    gap:clamp(1.5rem,3vw,2.6rem); align-items:start;
+  }
+  @media (max-width:900px){ .grid2{ grid-template-columns:1fr; } }
+
+  .prose{ color:var(--text-soft); max-width:60ch; }
+  .prose > * + *{ margin-top:.9rem; }
+  .prose strong{ color:var(--text); font-weight:600; }
+
+  /* ---------- 계기판(스코프) 패널 : 라이트/다크 상관없이 항상 어두운 평면 카드(제품 사진처럼 그림자를 지닌 유일한 요소) ---------- */
+  .scope{
+    background:var(--scope-bg); border-radius:var(--radius); box-shadow:0 3px 30px rgba(0,0,0,.22);
+    border:1px solid rgba(255,255,255,.08); padding:clamp(1.1rem,2.5vw,1.6rem);
+    color:var(--scope-text); position:relative;
+  }
+  .scope-head{
+    display:flex; justify-content:space-between; align-items:baseline; gap:1rem;
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--scope-dim); margin-bottom:1rem; position:relative;
+  }
+  .scope-head b{ color:var(--scope-teal); font-weight:600; }
+  .scope canvas{ display:block; width:100%; height:auto; border-radius:8px; background:var(--scope-bg); }
+  .scope-row{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; position:relative; }
+
+  .btn{
+    font-family:var(--font-body); font-size:.9rem; font-weight:400;
+    padding:.62em 1.3em; border-radius:9999px; border:1px solid var(--border); cursor:pointer;
+    background:var(--surface); color:var(--text); transition:transform .1s, background .15s, border-color .15s, opacity .15s;
+  }
+  .btn:hover{ border-color:var(--c0); }
+  .btn:active{ transform:scale(.95); }
+  .btn-primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-focus); border-color:var(--primary-focus); }
+  .scope .btn{
+    font-family:var(--font-mono); font-size:.82rem; letter-spacing:.02em; font-weight:600;
+    padding:.6em 1.05em; border-radius:8px;
+    background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:var(--scope-text);
+  }
+  .scope .btn:hover{ border-color:var(--scope-teal); background:rgba(255,255,255,.06); }
+  .scope .btn-primary{ background:var(--scope-teal); border-color:var(--scope-teal); color:#04231f; }
+  .scope .btn-primary:hover{ background:var(--scope-teal); filter:brightness(1.08); }
+  .scope .btn-amber{ background:transparent; border-color:var(--scope-amber); color:var(--scope-amber); }
+  .scope .btn-amber:hover{ background:rgba(255,182,72,.12); }
+
+  .readout{ font-family:var(--font-mono); }
+  .readout .big{ font-size:1.9rem; font-weight:700; color:var(--scope-teal); }
+  .kv{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:.85rem; padding:.3em 0; color:var(--scope-text); }
+  .kv span:last-child{ color:var(--scope-dim); }
+
+  input[type="range"]{ width:100%; accent-color:var(--primary); height:1.4rem; }
+  .scope input[type="range"]{ accent-color:var(--scope-teal); }
+  .slider-label{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:.78rem; color:var(--text-faint); margin-bottom:.35rem; }
+  .scope .slider-label{ color:var(--scope-dim); }
+
+  /* ---------- 확률 바 ---------- */
+  .probbar-row{ display:flex; align-items:center; gap:.8rem; margin-top:.7rem; }
+  .probbar-label{ font-family:var(--font-mono); font-size:.85rem; width:3.4em; flex-shrink:0; }
+  .probbar-track{ flex:1; height:14px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; position:relative; }
+  .probbar-fill{ height:100%; border-radius:99px; transition:width .35s ease; }
+  .probbar-val{ font-family:var(--font-mono); font-size:.85rem; width:3.6em; text-align:right; flex-shrink:0; }
+
+  /* ---------- 큰 숫자 표시(지수 벽) ---------- */
+  .bignum-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:.4rem; }
+  .bignum{ font-family:var(--font-mono); font-size:clamp(1rem,3vw,1.5rem); white-space:nowrap; color:var(--scope-amber); font-weight:600; }
+  .bar-meter{ height:10px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:.6rem; }
+  .bar-meter > i{ display:block; height:100%; background:linear-gradient(90deg,var(--scope-teal),var(--scope-violet)); border-radius:99px; transition:width .25s ease; }
+
+  /* ---------- 테이블 ---------- */
+  .tablewrap{ overflow-x:auto; margin-top:.8rem; }
+  table.xtab{ border-collapse:collapse; font-family:var(--font-mono); font-size:.85rem; min-width:320px; }
+  table.xtab th, table.xtab td{ border:1px solid rgba(255,255,255,.12); padding:.55em .9em; text-align:center; }
+  table.xtab th{ color:var(--scope-dim); font-weight:600; background:rgba(255,255,255,.03); }
+  table.xtab td.hot{ color:var(--scope-amber); font-weight:700; }
+  table.xtab td.cold{ color:var(--scope-dim); }
+
+  .chiprow{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem; }
+  .chip{ font-family:var(--font-mono); font-size:.72rem; padding:.3em .55em; border-radius:6px; display:inline-flex; gap:.3em; align-items:center; }
+  .chip .a{ color:var(--scope-teal); }
+  .chip .b{ color:var(--scope-violet); }
+  .chip{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+
+  /* ---------- 카드 (하드라인 테두리만, 그림자 없음 — Apple 규칙) ---------- */
+  .cardgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.1rem; margin-top:1.4rem; }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px;
+  }
+  .card h3{ font-size:1.05rem; margin-bottom:.55rem; letter-spacing:-.006em; }
+  .card p{ color:var(--text-soft); font-size:.92rem; }
+  .card .tag{ font-family:var(--font-body); font-size:.72rem; font-weight:600; color:var(--c0); letter-spacing:.06em; text-transform:uppercase; }
+
+  /* 비교 카드는 톤 자체를 뒤집어 대비를 만든다(두 번째 액센트 색 없이) */
+  .versus{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:1.4rem; }
+  @media (max-width:700px){ .versus{ grid-template-columns:1fr; } }
+  .versus .card{ box-shadow:none; }
+  .versus .card.left{ background:#ffffff; border:1px solid rgba(0,0,0,.08); }
+  .versus .card.left, .versus .card.left h3{ color:#1d1d1f; }
+  .versus .card.left p{ color:#48484a; }
+  .versus .card.left .tag{ color:var(--primary); }
+  .versus .card.right{ background:#1d1d1f; border:1px solid rgba(255,255,255,.14); }
+  .versus .card.right, .versus .card.right h3{ color:#ffffff; }
+  .versus .card.right p{ color:#cccccc; }
+  .versus .card.right .tag{ color:var(--primary-on-dark); }
+  .versus h3{ font-family:var(--font-display); }
+  .versus blockquote{ font-style:normal; margin:.9rem 0 0; font-size:1rem; font-weight:600; letter-spacing:-.006em; }
+
+  /* ---------- 반성 노트 ---------- */
+  .reflect{ margin-top:1.6rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.4rem; }
+  .reflect label{ display:block; font-size:.85rem; color:var(--text-faint); margin-bottom:.4rem; }
+  .reflect textarea{
+    width:100%; resize:vertical; min-height:4.2em; border-radius:var(--radius-sm); border:1px solid var(--border);
+    background:var(--bg-soft); color:var(--text); padding:.75em .9em; font-size:.95rem; line-height:1.6;
+  }
+  .reflect .two{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media (max-width:640px){ .reflect .two{ grid-template-columns:1fr; } }
+  .reflect .actions{ margin-top:1rem; display:flex; gap:.6rem; align-items:center; }
+  .savedlog{ margin-top:1.2rem; border-top:1px dashed var(--border); padding-top:1rem; display:flex; flex-direction:column; gap:.7rem; }
+  .savedlog .entry{ font-size:.88rem; color:var(--text-soft); background:var(--bg-soft); border-radius:8px; padding:.7em .9em; }
+  .savedlog .entry time{ display:block; font-family:var(--font-mono); font-size:.7rem; color:var(--text-faint); margin-bottom:.3em; }
+
+  /* ---------- 신화 깨기(디스클로저) ---------- */
+  details.myth{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.9em 1.1em; margin-top:.7em; }
+  details.myth summary{ cursor:pointer; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:1rem; align-items:center; }
+  details.myth summary::-webkit-details-marker{ display:none; }
+  details.myth summary::after{ content:"펼치기 ▾"; font-size:.72rem; color:var(--text-faint); font-weight:400; }
+  details.myth[open] summary::after{ content:"접기 ▴"; }
+  details.myth .verdict{ margin-top:.7em; font-size:.9rem; color:var(--text-soft); padding-top:.7em; border-top:1px dashed var(--border); }
+  details.myth .verdict b.tag-false{ color:var(--measure); }
+  details.myth .verdict b.tag-part{ color:#8a7a1f; }
+
+  .footer-tile .page{ padding-top:40px; padding-bottom:40px; }
+  footer p{ color:var(--text-faint); font-size:.85rem; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration:.001ms !important; animation-duration:.001ms !important; }
+  }
+</style>
+
+<nav class="gnav" aria-label="빠른 이동">
+  <div class="gnav-inner">
+    <span class="gnav-brand">양자와 미시 세계 — 중첩과 측정</span>
+    <div class="gnav-links">
+      <a href="#s1">도입</a><a href="#s2">큐비트</a><a href="#s3">이중슬릿</a><a href="#s4">얽힘</a><a href="#s5">해석 논쟁</a><a href="#s6">기술과 사회</a>
+    </div>
+  </div>
+</nav>
+
+<div class="navdots" id="navdots" aria-hidden="true">
+  <a href="#s1" data-tip="01 · 도입"><span class="tip">01 도입</span></a>
+  <a href="#s2" data-tip="02 · 큐비트"><span class="tip">02 큐비트</span></a>
+  <a href="#s3" data-tip="03 · 이중슬릿"><span class="tip">03 이중슬릿</span></a>
+  <a href="#s4" data-tip="04 · 얽힘"><span class="tip">04 얽힘</span></a>
+  <a href="#s5" data-tip="05 · 해석 논쟁"><span class="tip">05 해석 논쟁</span></a>
+  <a href="#s6" data-tip="06 · 기술과 사회"><span class="tip">06 기술과 사회</span></a>
+</div>
+
+<header class="tile tile-light">
+  <div class="page hero">
+    <div class="kicker" style="font-size:.78rem; letter-spacing:.02em; color:var(--text-faint); margin-bottom:1.1rem;">고등학교 물리 Ⅲ. 양자와 미시 세계 — (1) 중첩과 측정</div>
+    <h1 style="font-size:clamp(2rem,5vw,3.2rem); line-height:1.25; max-width:18ch; margin-bottom:1.1rem; letter-spacing:-.015em;">큐비트는 <em style="font-style:normal; color:var(--c0);">0과 1을 동시에</em> 갖지 않는다 — 그럼 무엇을 갖는가?</h1>
+    <p style="max-width:62ch; color:var(--text-soft); font-size:1.05rem;">중첩, 측정, 얽힘은 말로 설명하면 자꾸 오해를 낳는 개념입니다. 이 페이지는 직접 슬라이더를 움직이고, 입자를 쏘고, 큐비트를 측정해 보면서 &mdash; 확률로 기술되는 세계를 눈으로 확인하는 실습장입니다.</p>
+    <p style="margin-top:1.6rem; font-size:.8rem; color:var(--text-faint);">성취기준 [12전자03-01] 단일 양자 이중슬릿 · [12전자03-02] 중첩·측정·얽힘·양자기술</p>
+  </div>
+</header>
+
+<!-- ============ 01 도입 ============ -->
+<section class="tile tile-parchment unit" id="s1">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">01 · 도입</div>
+    <h2>고전 컴퓨터가 감당하지 못하는 문제</h2>
+    <p class="lede">비트가 하나 늘어날 때마다 표현할 수 있는 경우의 수는 <strong>2배</strong>가 됩니다. 늘어나는 속도는 완만해 보이지만, 그 결과는 순식간에 우주적 규모가 됩니다.</p>
+  </div>
+  <div class="grid2">
+    <div class="prose">
+      <p>동전 <var>n</var>개를 던지면 나올 수 있는 앞뒤 조합은 2ⁿ가지입니다. 고전 비트도 마찬가지입니다 &mdash; 비트 <var>n</var>개는 2ⁿ가지의 서로 다른 상태 중 정확히 하나를 나타냅니다.</p>
+      <p>오른쪽 슬라이더로 <var>n</var>을 늘려 보세요. 슬라이더는 완만하게 오른쪽으로 움직이는데, 그 아래 숫자는 자릿수가 감당이 안 될 만큼 폭발적으로 길어집니다. <strong>암호를 전수조사로 뚫거나, 분자 하나의 양자 상태를 그대로 흉내 내려는 시도</strong>가 고전 컴퓨터로는 사실상 불가능한 이유가 바로 이 그래프 한 장에 들어 있습니다.</p>
+      <p><strong>그래서 &ldquo;양자컴퓨터 = 더 빠른 컴퓨터&rdquo;가 아닙니다.</strong> 이 방대한 상태 공간을 전부 &ldquo;동시에 들여다보는&rdquo; 마법 같은 장치는 아닙니다. 대신 3번 섹션에서 볼 확률파동의 간섭을 이용해, 정답에 해당하는 상태가 관측될 확률을 의도적으로 높이는 &mdash; 계산의 규칙 자체가 다른 &mdash; 장치에 가깝습니다. &ldquo;더 빠른&rdquo;이 아니라 &ldquo;다른 방식의&rdquo; 컴퓨터인 이유입니다.</p>
+    </div>
+    <div class="scope">
+      <div class="scope-head"><span>CLASSICAL STATE SPACE</span><b id="expo-mode">2ⁿ</b></div>
+      <div class="slider-label"><span>고전 비트 개수 n</span><span class="tabular" id="expo-n-label">n = 8</span></div>
+      <input type="range" id="expo-slider" min="1" max="256" step="1" value="8" list="expo-ticks" aria-label="고전 비트 개수" />
+      <datalist id="expo-ticks"><option value="8"></option><option value="16"></option><option value="32"></option><option value="64"></option><option value="128"></option><option value="256"></option></datalist>
+      <div class="bar-meter"><i id="expo-bar" style="width:3%"></i></div>
+      <div class="readout" style="margin-top:1.1rem;">
+        <div class="kv"><span>표현 가능한 상태 수 (2ⁿ)</span></div>
+        <div class="bignum-wrap"><div class="bignum tabular" id="expo-bignum">256</div></div>
+        <div class="kv"><span>근사값</span><span id="expo-approx" class="tabular">≈ 2.56 × 10²</span></div>
+      </div>
+      <p id="expo-compare" style="margin-top:.9rem; font-size:.85rem; color:var(--scope-text); position:relative;">비교: 한 학년 전체 학생 수보다 많아졌습니다.</p>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ 02 큐비트 ============ -->
+<section class="tile tile-dark unit" id="s2">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">02 · 개념</div>
+    <h2>큐비트란? — 상태 벡터와 중첩</h2>
+    <p class="lede">큐비트의 상태는 α|0⟩ + β|1⟩로 적습니다. 계수 앞의 <strong>제곱한 값</strong>이 그 결과가 측정될 확률입니다.</p>
+  </div>
+  <div class="grid2">
+    <div class="prose">
+      <p>슬라이더로 각도 θ를 움직이면 α = cos θ, β = sin θ가 정해지고, 오른쪽 벡터 그림의 화살표가 |0⟩ 축과 |1⟩ 축 사이에서 회전합니다. 아래 확률 막대는 각각 α², β²&mdash;즉 측정했을 때 그 결과가 나올 확률입니다.</p>
+      <p><strong>중첩은 &ldquo;동시에 두 값을 가진 상태&rdquo;가 아닙니다.</strong> 동전을 던져 손바닥으로 가린 것과는 다릅니다. 가려진 동전은 사실 이미 앞면이든 뒷면이든 정해져 있고, 우리가 &ldquo;모를&rdquo; 뿐입니다(고전적 확률). 반면 중첩 상태의 큐비트는 측정 전까지 0도 1도 아직 어느 쪽으로도 정해지지 않은 상태이고, 측정하는 순간 확률에 따라 무작위로 하나의 값으로 &ldquo;정해집니다&rdquo;(양자적 확률). 중첩은 값이 아니라 측정 확률로 기술되는 상태 그 자체입니다.</p>
+      <p>&ldquo;측정하기&rdquo;를 여러 번 눌러 보세요. 한 번의 결과는 완전히 무작위지만, 누적 횟수가 많아질수록 실제 비율은 α², β²에 점점 가까워집니다 &mdash; 동전을 수백 번 던졌을 때 누적 상대도수가 1/2에 가까워지는 것과 같은 원리입니다.</p>
+    </div>
+    <div class="scope">
+      <div class="scope-head"><span>QUBIT STATE</span><b id="qb-state-label">α|0⟩ + β|1⟩</b></div>
+      <canvas id="qb-canvas" width="520" height="300" role="img" aria-label="큐비트 상태 벡터 다이어그램"></canvas>
+      <div class="slider-label"><span>각도 θ</span><span class="tabular" id="qb-theta-label">θ = 35°</span></div>
+      <input type="range" id="qb-slider" min="0" max="90" step="1" value="35" aria-label="큐비트 각도 theta" />
+      <div class="probbar-row">
+        <span class="probbar-label" style="color:var(--scope-teal)">P(|0⟩)</span>
+        <span class="probbar-track"><span class="probbar-fill" id="qb-bar0" style="width:67%; background:var(--scope-teal);"></span></span>
+        <span class="probbar-val tabular" id="qb-p0val">67.0%</span>
+      </div>
+      <div class="probbar-row">
+        <span class="probbar-label" style="color:var(--scope-violet)">P(|1⟩)</span>
+        <span class="probbar-track"><span class="probbar-fill" id="qb-bar1" style="width:33%; background:var(--scope-violet);"></span></span>
+        <span class="probbar-val tabular" id="qb-p1val">33.0%</span>
+      </div>
+      <div class="scope-row">
+        <button class="btn btn-primary" id="qb-measure1">측정하기 ×1</button>
+        <button class="btn" id="qb-measure10">×10</button>
+        <button class="btn" id="qb-measure100">×100</button>
+        <button class="btn btn-amber" id="qb-reset">초기화</button>
+      </div>
+      <div class="readout" style="margin-top:1rem;">
+        <div class="kv"><span>마지막 측정 결과</span><span class="tabular" id="qb-lastresult">—</span></div>
+        <div class="kv"><span>누적 측정 횟수</span><span class="tabular" id="qb-total">0</span></div>
+        <div class="kv"><span>실제 |0⟩ 비율 (이론값 <span id="qb-theory0">67.0%</span>)</span><span class="tabular" id="qb-freq0">—</span></div>
+        <div class="kv"><span>실제 |1⟩ 비율 (이론값 <span id="qb-theory1">33.0%</span>)</span><span class="tabular" id="qb-freq1">—</span></div>
+      </div>
+      <div class="chiprow" id="qb-log" aria-label="최근 측정 기록"></div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ 03 이중슬릿 ============ -->
+<section class="tile tile-light unit" id="s3">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">03 · 실험</div>
+    <h2>중첩과 측정 — 이중슬릿 실험</h2>
+    <p class="lede">입자를 하나씩 쏘아도, 화면에는 결국 <strong>간섭무늬</strong>가 쌓입니다. 한 개의 결과는 완전히 무작위지만, 전체 분포는 확률파동의 간섭으로 정확히 예측됩니다.</p>
+  </div>
+  <div class="grid2">
+    <div class="prose">
+      <p>입자(광자·전자 등)를 한 번에 하나씩 두 개의 슬릿을 향해 쏩니다. 각 입자가 스크린의 어디에 도착할지는 예측할 수 없지만, 수많은 입자가 쌓이면 밝고 어두운 줄무늬 &mdash; 간섭무늬 &mdash; 가 나타납니다. 이는 입자 하나하나가 마치 파동처럼 두 슬릿을 동시에 &ldquo;지나가며&rdquo; 스스로와 간섭한 결과로 해석됩니다.</p>
+      <p><strong>한쪽 슬릿을 막아보세요.</strong> 어느 슬릿을 지났는지 알 수 있게(경로 정보 확보) 되는 순간, 간섭무늬는 사라지고 평범한 하나의 뭉치(단일슬릿 회절 패턴)만 남습니다. 측정(경로 확인)이 중첩을 무너뜨린다는 것을 보여주는 대표적인 예시입니다.</p>
+      <p><strong>주의할 점.</strong> 화면 위 각 점은 &ldquo;입자가 파동이면서 동시에 입자&rdquo;라는 것을 낱장으로 보여주는 것이 아니라, 측정은 언제나 하나의 위치에서 하나의 결과로만 일어난다는 것을 보여줍니다. 파동적 성질은 그 결과들이 쌓였을 때의 확률 분포로만 드러납니다.</p>
+    </div>
+    <div class="scope">
+      <div class="scope-head"><span id="ds-mode-label">DOUBLE SLIT · OPEN</span><b id="ds-count-label">N = 0</b></div>
+      <canvas id="ds-canvas" width="640" height="360" role="img" aria-label="이중슬릿 검출 화면 누적 시뮬레이션"></canvas>
+      <div class="scope-row">
+        <button class="btn btn-primary" id="ds-fire1">발사 ×1</button>
+        <button class="btn" id="ds-fire10">×10</button>
+        <button class="btn" id="ds-fire100">×100</button>
+        <button class="btn" id="ds-fire10000">×10,000</button>
+        <button class="btn btn-amber" id="ds-reset">초기화</button>
+      </div>
+      <div class="scope-row" style="align-items:center;">
+        <label style="display:flex; align-items:center; gap:.5em; font-family:var(--font-mono); font-size:.82rem; color:var(--scope-text);">
+          <input type="checkbox" id="ds-block" style="accent-color:var(--scope-amber); width:1.1em; height:1.1em;" />
+          한쪽 슬릿 막기 (경로 정보 확보)
+        </label>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ 04 얽힘 ============ -->
+<section class="tile tile-dark-2 unit" id="s4">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">04 · 개념</div>
+    <h2>얽힘 — 각자 무작위, 그러나 짝을 이루는 결과</h2>
+    <p class="lede">얽힌 큐비트 두 개를 각각 측정하면, 개별 결과는 매번 완전히 무작위입니다. 그런데 <strong>둘을 짝지어 보면</strong> 뚜렷한 상관관계가 드러납니다.</p>
+  </div>
+  <div class="grid2">
+    <div class="prose">
+      <p>아래 계기판은 얽힌 큐비트 쌍 A, B를 반복해서 측정하는 실험입니다. A의 결과만 보면 0과 1이 절반씩 무작위로 나오고, B도 마찬가지입니다. 하지만 <strong>같은 쌍의 A와 B는 항상 반대 값</strong>으로 나옵니다 &mdash; 교차표를 보면 (0,0)과 (1,1) 칸은 비어 있고, (0,1)과 (1,0) 칸만 채워지는 것을 확인할 수 있습니다.</p>
+      <div class="versus">
+        <div class="card left">
+          <div class="tag">고전적 상관 · 장갑 비유</div>
+          <h3>장갑 한 켤레</h3>
+          <p>장갑 한 켤레를 상자 두 개에 나눠 각각 다른 도시로 보냈다고 합시다. 상자를 열기 전에도 왼손 장갑은 <strong>이미</strong> 왼손 장갑이었습니다. 우리가 몰랐을 뿐, 정답은 처음부터 정해져 있었습니다 (숨은 변수).</p>
+        </div>
+        <div class="card right">
+          <div class="tag">양자 얽힘</div>
+          <h3>얽힌 큐비트 쌍</h3>
+          <p>양자역학의 표준적인 해석에서는, 측정 전 A와 B 각각의 결과는 <strong>아직 정해져 있지 않습니다.</strong> 그런데도 측정하는 순간 둘의 결과는 상관관계를 만족합니다. &ldquo;미리 정해진 답을 각자 들고 있었다&rdquo;는 설명(숨은 변수)만으로는 이 상관관계의 통계적 성질을 다 설명할 수 없다는 것이 벨 부등식 관련 실험들로 확인되었습니다.</p>
+        </div>
+      </div>
+      <p style="margin-top:1rem; font-size:.9rem; color:var(--text-faint);">※ 장갑 비유는 &ldquo;개별적으로는 무작위, 쌍으로는 상관&rdquo;이라는 느낌을 잡는 데는 유용하지만, &ldquo;측정 전에는 정말 아무것도 정해져 있지 않다&rdquo;는 양자역학의 핵심을 그대로 담지는 못합니다. 비유는 어디까지나 출발점입니다.</p>
+    </div>
+    <div class="scope">
+      <div class="scope-head"><span>ENTANGLED PAIR A · B</span><b id="ent-total-label">시행 0회</b></div>
+      <div class="scope-row">
+        <button class="btn btn-primary" id="ent-run1">측정하기 ×1</button>
+        <button class="btn" id="ent-run10">×10</button>
+        <button class="btn" id="ent-run100">×100</button>
+        <button class="btn btn-amber" id="ent-reset">초기화</button>
+      </div>
+      <div class="tablewrap">
+        <table class="xtab" id="ent-table">
+          <thead><tr><th></th><th style="color:var(--scope-teal)">B = 0</th><th style="color:var(--scope-violet)">B = 1</th></tr></thead>
+          <tbody>
+            <tr><th style="color:var(--scope-teal)">A = 0</th><td class="cold tabular" id="ent-00">0</td><td class="hot tabular" id="ent-01">0</td></tr>
+            <tr><th style="color:var(--scope-violet)">A = 1</th><td class="hot tabular" id="ent-10">0</td><td class="cold tabular" id="ent-11">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-family:var(--font-mono); font-size:.78rem; color:var(--scope-dim); margin-top:.6rem;">대각선(0,0)/(1,1) 칸은 이 모형에서 항상 0으로 남습니다 — 상관관계가 시각적으로 드러나는 지점입니다.</p>
+      <div class="chiprow" id="ent-log" aria-label="최근 측정 기록"></div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ 05 해석 논쟁 ============ -->
+<section class="tile tile-parchment unit" id="s5">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">05 · 토론</div>
+    <h2>해석 논쟁 — 실재론과 도구주의</h2>
+    <p class="lede">측정 이전의 전자는 &ldquo;어딘가에 있었지만 몰랐던 것&rdquo;일까요, &ldquo;아직 어디에도 없었던 것&rdquo;일까요? 물리학자들 사이에서도 여전히 완전히 합의되지 않은 질문입니다.</p>
+  </div>
+  <div class="grid2">
+    <div class="prose">
+      <p>아인슈타인은 물리량이 측정과 무관하게 실재한다고 믿었고(실재론), 보어는 측정이라는 행위 이전에 물리량이 확정된 값을 갖는다고 말할 수 없다고 보았습니다(도구주의에 가까운 입장). 이 논쟁은 &ldquo;양자역학은 세계를 있는 그대로 그리는 이론인가, 아니면 관측 결과를 정확히 예측만 하면 충분한 도구인가&rdquo;라는 질문으로 이어집니다.</p>
+      <p>정답을 외우는 문제가 아닙니다. 아래 두 입장을 읽고, 나의 생각을 정리해 보세요.</p>
+    </div>
+    <div>
+      <div class="versus" style="margin-top:0;">
+        <div class="card left">
+          <div class="tag">실재론 (아인슈타인 계열)</div>
+          <h3>&ldquo;몰랐을 뿐, 있었다&rdquo;</h3>
+          <p>측정 전에도 전자는 어떤 확정된 물리적 상태를 갖고 있었다. 양자역학의 확률은 우리가 그 &ldquo;숨은 변수&rdquo;를 다 모르기 때문에 어쩔 수 없이 쓰는 통계일 뿐, 자연 자체가 비결정적인 것은 아니다.</p>
+          <blockquote>&ldquo;신은 주사위 놀이를 하지 않는다.&rdquo;</blockquote>
+        </div>
+        <div class="card right">
+          <div class="tag">도구주의 (보어 계열)</div>
+          <h3>&ldquo;아직 없었다&rdquo;</h3>
+          <p>측정 전의 전자에 &ldquo;위치&rdquo;라는 확정된 값이 있었다고 말하는 것 자체가 의미가 없다. 양자역학의 상태 벡터는 실재를 그리는 그림이 아니라, 측정했을 때 무엇이 나올지에 대한 확률을 정확히 계산해 주는 도구다.</p>
+          <blockquote>&ldquo;측정되지 않은 것에 대해 이야기하지 말라.&rdquo;</blockquote>
+        </div>
+      </div>
+      <div class="reflect">
+        <div class="eyebrow" style="margin-bottom:.9rem;">나의 입장 정리하기</div>
+        <div class="two">
+          <div>
+            <label for="reflect-before">나는 전에는…</label>
+            <textarea id="reflect-before" placeholder="예: 측정 전에도 전자의 위치는 이미 정해져 있고, 우리가 모를 뿐이라고 생각했다."></textarea>
+          </div>
+          <div>
+            <label for="reflect-after">지금은…</label>
+            <textarea id="reflect-after" placeholder="예: 지금은 측정이라는 사건 자체가 값을 확정 짓는 과정이라는 설명 쪽이 더 설득력 있다고 생각한다. 왜냐하면…"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="reflect-save">내 생각 저장하기</button>
+          <span id="reflect-status" style="font-size:.78rem; color:var(--text-faint);"></span>
+        </div>
+        <div class="savedlog" id="reflect-log"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ 06 양자 기술과 사회 ============ -->
+<section class="tile tile-light unit" id="s6">
+  <div class="page">
+  <div class="unit-head">
+    <div class="eyebrow">06 · 응용</div>
+    <h2>양자 기술과 사회</h2>
+    <p class="lede">여러분이 이 기술에 투자할지 결정해야 하는 비전문가 위원회 앞에서 브리핑을 한다고 상상해 보세요. &ldquo;0과 1을 동시에 갖는다&rdquo; 같은 광고 문구에 위원들은 이미 회의적입니다. 지금까지 확인한 개념만으로 정직하게 설명해 봅시다.</p>
+  </div>
+  <div class="cardgrid">
+    <div class="card">
+      <div class="tag">양자컴퓨터</div>
+      <h3>왜 특정 문제에서만 유리한가</h3>
+      <p>양자컴퓨터는 모든 계산을 빠르게 만드는 만능 장치가 아닙니다. 중첩과 간섭을 이용해, 답이 아닌 경로들의 확률을 서로 상쇄시키고 정답 경로의 확률을 키우는 알고리즘을 설계할 수 있는 문제 &mdash; 큰 수의 소인수분해, 특정 분자·물질의 양자 상태 시뮬레이션 등 &mdash; 에서 비로소 고전 컴퓨터를 압도합니다.</p>
+    </div>
+    <div class="card">
+      <div class="tag">양자암호(양자 키 분배)</div>
+      <h3>엿듣는 순간 티가 난다</h3>
+      <p>양자 상태는 측정하는 순간 흔적 없이 확인할 수 없게 바뀝니다(교란). 그래서 통신 도중 누군가 몰래 정보를 측정해 엿들으면, 송수신자가 그 교란의 흔적을 통계적으로 탐지할 수 있습니다. &ldquo;도청이 원리적으로 발각되는&rdquo; 암호 체계라는 뜻이며, 도청 자체가 불가능하다는 뜻은 아닙니다.</p>
+    </div>
+    <div class="card">
+      <div class="tag">사회적 영향</div>
+      <h3>기존 암호 체계와의 관계</h3>
+      <p>현재 널리 쓰이는 일부 암호(RSA 등)는 &ldquo;소인수분해가 고전 컴퓨터로는 사실상 불가능할 만큼 오래 걸린다&rdquo;는 가정에 기대고 있습니다. 실용적인 대규모 양자컴퓨터가 등장하면 이 가정이 흔들릴 수 있어, 이를 대비한 새로운 암호 체계(양자내성암호) 연구도 함께 진행되고 있습니다.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:2.2rem;">
+    <div class="eyebrow" style="margin-bottom:.9rem;">정책 브리핑 체크 · 이 표현, 정확할까?</div>
+    <details class="myth">
+      <summary>&ldquo;큐비트는 0과 1을 동시에 가진다.&rdquo;</summary>
+      <div class="verdict"><b class="tag-false">부정확한 표현.</b> 큐비트는 두 값을 &ldquo;동시에 가진&rdquo; 것이 아니라, 측정했을 때 0 또는 1이 나올 <strong>확률로 기술되는 상태</strong>에 있는 것입니다. 2번 섹션에서 확인했듯, 측정하는 순간 결과는 언제나 둘 중 하나로만 나옵니다.</div>
+    </details>
+    <details class="myth">
+      <summary>&ldquo;양자컴퓨터는 모든 경우의 수를 동시에 계산해서 더 빠르다.&rdquo;</summary>
+      <div class="verdict"><b class="tag-false">과장된 표현.</b> 여러 상태를 중첩으로 준비할 수는 있지만, 그 상태를 그대로 &ldquo;다 읽어낼&rdquo; 수는 없습니다(측정하면 하나만 남으므로). 실제 이점은 간섭을 이용해 정답의 확률을 키우도록 설계된 알고리즘이 있는 문제에서만 나타납니다.</div>
+    </details>
+    <details class="myth">
+      <summary>&ldquo;양자컴퓨터가 상용화되면 지금의 암호는 전부 무력화된다.&rdquo;</summary>
+      <div class="verdict"><b class="tag-part">부분적으로 맞음.</b> 소인수분해에 기반한 일부 암호 체계는 위협받을 수 있지만, 모든 암호가 그런 것은 아니며 이에 대응하는 양자내성암호도 함께 개발되고 있습니다. &ldquo;전부&rdquo;라는 단정은 과장입니다.</div>
+    </details>
+    <details class="myth">
+      <summary>&ldquo;얽힌 입자를 이용하면 순간적으로 정보를 전송할 수 있다.&rdquo;</summary>
+      <div class="verdict"><b class="tag-false">틀린 표현.</b> 얽힘은 결과들 사이의 상관관계를 만들 뿐, 그 자체로 메시지를 전달하지는 못합니다. B의 결과를 확인하려면 결국 A 쪽에서 얻은 정보를 고전적인 통신 수단(전화, 인터넷 등)으로 보내야 상관관계를 &ldquo;활용&rdquo;할 수 있습니다.</div>
+    </details>
+  </div>
+  </div>
+</section>
+
+<footer class="tile tile-parchment footer-tile">
+  <div class="page">
+    <p>고등학교 물리 Ⅲ. 양자와 미시 세계 — (1) 중첩과 측정 단원 융합 프로그램을 바탕으로 제작된 인터랙티브 학습 자료입니다. 모든 시뮬레이션의 난수는 이 페이지 안에서만 계산되며, &ldquo;나의 입장&rdquo; 기록은 이 브라우저에만 저장됩니다.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ================= 01. 지수 벽 ================= */
+  var expoSlider = document.getElementById("expo-slider");
+  var expoNLabel = document.getElementById("expo-n-label");
+  var expoBar = document.getElementById("expo-bar");
+  var expoBignum = document.getElementById("expo-bignum");
+  var expoApprox = document.getElementById("expo-approx");
+  var expoCompare = document.getElementById("expo-compare");
+
+  var COMPARE_REFS = [
+    {digits: 3, label: "한 학년 전체 학생 수보다 많아졌습니다."},
+    {digits: 6, label: "웬만한 중소도시의 인구를 넘어섰습니다."},
+    {digits: 8, label: "대한민국 전체 인구(약 5천만)를 넘어섰습니다."},
+    {digits: 10, label: "지구 전체 인구(약 80억)를 넘어섰습니다."},
+    {digits: 12, label: "은하 하나에 있는 별의 개수(수천억) 규모에 도달했습니다."},
+    {digits: 18, label: "우주 나이(약 138억 년)를 초 단위로 환산한 값을 넘어섰습니다."},
+    {digits: 24, label: "지구 전체의 모래알 개수 추정치를 넘어섰습니다."},
+    {digits: 78, label: "관측 가능한 우주의 원자 개수 추정치(약 10⁸⁰)에 근접했습니다 — AES-256 암호 키 하나를 고르는 경우의 수입니다."}
+  ];
+
+  function fmtBigInt(b){
+    var s = b.toString();
+    var out = "", c = 0;
+    for (var i = s.length - 1; i >= 0; i--){
+      out = s[i] + out; c++;
+      if (c % 3 === 0 && i !== 0) out = "," + out;
+    }
+    return out;
+  }
+  function approxSci(str){
+    var mantissa = str.slice(0,4);
+    var m = mantissa[0] + "." + mantissa.slice(1);
+    var exp = str.length - 1;
+    return "≈ " + m + " × 10" + toSup(exp);
+  }
+  var supMap = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+  function toSup(n){ return String(n).split("").map(function(d){return supMap[d]||d;}).join(""); }
+
+  function updateExpo(){
+    var n = parseInt(expoSlider.value, 10);
+    expoNLabel.textContent = "n = " + n;
+    expoBar.style.width = Math.max(2, (n/256*100)) + "%";
+    var big = 1n << BigInt(n); // 2^n
+    var str = big.toString();
+    expoBignum.textContent = fmtBigInt(big);
+    expoApprox.textContent = approxSci(str);
+    var digits = str.length;
+    var label = "아직 100명 남짓한 학급 정원 수준입니다.";
+    for (var i = 0; i < COMPARE_REFS.length; i++){
+      if (digits >= COMPARE_REFS[i].digits) label = COMPARE_REFS[i].label;
+    }
+    expoCompare.textContent = "비교: " + label;
+  }
+  expoSlider.addEventListener("input", updateExpo);
+  updateExpo();
+
+  /* ================= 02. 큐비트 ================= */
+  var qbSlider = document.getElementById("qb-slider");
+  var qbThetaLabel = document.getElementById("qb-theta-label");
+  var qbCanvas = document.getElementById("qb-canvas");
+  var qbCtx = qbCanvas.getContext("2d");
+  var qbBar0 = document.getElementById("qb-bar0"), qbBar1 = document.getElementById("qb-bar1");
+  var qbP0val = document.getElementById("qb-p0val"), qbP1val = document.getElementById("qb-p1val");
+  var qbLast = document.getElementById("qb-lastresult");
+  var qbTotalEl = document.getElementById("qb-total");
+  var qbFreq0 = document.getElementById("qb-freq0"), qbFreq1 = document.getElementById("qb-freq1");
+  var qbTheory0 = document.getElementById("qb-theory0"), qbTheory1 = document.getElementById("qb-theory1");
+  var qbLog = document.getElementById("qb-log");
+  var qbStateLabel = document.getElementById("qb-state-label");
+
+  var qbState = { theta: 35, p0: 0, p1: 0 };
+  var qbTally = { total: 0, c0: 0, c1: 0 };
+  var qbFlash = 0; // 0=none, "0" or "1" collapse highlight timer via CSS class swap
+
+  function qbCompute(){
+    var rad = qbState.theta * Math.PI / 180;
+    var alpha = Math.cos(rad), beta = Math.sin(rad);
+    qbState.p0 = alpha*alpha;
+    qbState.p1 = 1 - qbState.p0;
+    qbState.alpha = alpha; qbState.beta = beta;
+  }
+
+  function qbDrawVector(){
+    var w = qbCanvas.width, h = qbCanvas.height;
+    qbCtx.clearRect(0,0,w,h);
+    qbCtx.fillStyle = "#0a0f1a"; qbCtx.fillRect(0,0,w,h);
+    var ox = w*0.32, oy = h*0.85, R = Math.min(w,h)*0.5;
+
+    // grid
+    qbCtx.strokeStyle = "rgba(255,255,255,.06)"; qbCtx.lineWidth = 1;
+    for (var g=1; g<=4; g++){
+      qbCtx.beginPath(); qbCtx.arc(ox, oy, R*g/4, Math.PI, 1.5*Math.PI); qbCtx.stroke();
+    }
+    // axes
+    qbCtx.strokeStyle = "#5c6e86"; qbCtx.lineWidth = 1.5;
+    qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(ox, oy-R-24); qbCtx.stroke();
+    qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(ox+R+24, oy); qbCtx.stroke();
+    qbCtx.fillStyle = "#45d6c6"; qbCtx.font = "600 16px " + getMono();
+    qbCtx.fillText("|0⟩", ox-8, oy-R-32);
+    qbCtx.fillStyle = "#a394f2";
+    qbCtx.fillText("|1⟩", ox+R+30, oy+5);
+
+    // angle arc
+    qbCtx.strokeStyle = "rgba(255,182,72,.6)"; qbCtx.lineWidth = 1.5;
+    qbCtx.beginPath(); qbCtx.arc(ox, oy, 36, -Math.PI/2, -Math.PI/2 + qbState.theta*Math.PI/180); qbCtx.stroke();
+
+    // vector
+    var vx = ox + qbState.beta * R;
+    var vy = oy - qbState.alpha * R;
+    qbCtx.strokeStyle = "#ffb648"; qbCtx.lineWidth = 3; qbCtx.lineCap = "round";
+    qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(vx, vy); qbCtx.stroke();
+    // arrowhead
+    var ang = Math.atan2(vy-oy, vx-ox);
+    qbCtx.fillStyle = "#ffb648";
+    qbCtx.beginPath();
+    qbCtx.moveTo(vx, vy);
+    qbCtx.lineTo(vx - 10*Math.cos(ang-0.4), vy - 10*Math.sin(ang-0.4));
+    qbCtx.lineTo(vx - 10*Math.cos(ang+0.4), vy - 10*Math.sin(ang+0.4));
+    qbCtx.closePath(); qbCtx.fill();
+
+    // projections
+    qbCtx.setLineDash([4,4]);
+    qbCtx.strokeStyle = "rgba(69,214,198,.55)";
+    qbCtx.beginPath(); qbCtx.moveTo(ox,oy); qbCtx.lineTo(ox, vy); qbCtx.moveTo(ox,vy); qbCtx.lineTo(vx,vy); qbCtx.stroke();
+    qbCtx.setLineDash([]);
+
+    qbCtx.fillStyle = "#cfe0ee"; qbCtx.font = "13px " + getMono();
+    qbCtx.fillText("α = " + qbState.alpha.toFixed(2), ox+8, (oy+vy)/2);
+    qbCtx.fillText("β = " + qbState.beta.toFixed(2), (ox+vx)/2 - 14, vy - 10);
+  }
+  function getMono(){ return "ui-monospace, Menlo, Consolas, monospace"; }
+
+  function qbRenderProbs(){
+    var p0 = qbState.p0*100, p1 = qbState.p1*100;
+    qbBar0.style.width = p0 + "%"; qbBar1.style.width = p1 + "%";
+    qbP0val.textContent = p0.toFixed(1) + "%"; qbP1val.textContent = p1.toFixed(1) + "%";
+    qbTheory0.textContent = p0.toFixed(1) + "%"; qbTheory1.textContent = p1.toFixed(1) + "%";
+    qbStateLabel.textContent = qbState.alpha.toFixed(2) + "|0⟩ + " + qbState.beta.toFixed(2) + "|1⟩";
+  }
+
+  function qbRenderTally(){
+    qbTotalEl.textContent = qbTally.total.toLocaleString("ko-KR");
+    if (qbTally.total === 0){ qbFreq0.textContent = "—"; qbFreq1.textContent = "—"; return; }
+    qbFreq0.textContent = (qbTally.c0/qbTally.total*100).toFixed(1) + "%";
+    qbFreq1.textContent = (qbTally.c1/qbTally.total*100).toFixed(1) + "%";
+  }
+
+  function qbAddChip(v){
+    var span = document.createElement("span");
+    span.className = "chip";
+    span.innerHTML = '<span class="' + (v===0?'a':'b') + '">' + v + "</span>";
+    qbLog.appendChild(span);
+    while (qbLog.children.length > 24) qbLog.removeChild(qbLog.firstChild);
+  }
+
+  function qbMeasureOnce(){
+    var r = Math.random();
+    var outcome = (r < qbState.p0) ? 0 : 1;
+    qbTally.total++; if (outcome===0) qbTally.c0++; else qbTally.c1++;
+    qbAddChip(outcome);
+    return outcome;
+  }
+
+  qbSlider.addEventListener("input", function(){
+    qbState.theta = parseInt(qbSlider.value,10);
+    qbThetaLabel.textContent = "θ = " + qbState.theta + "°";
+    qbCompute(); qbDrawVector(); qbRenderProbs();
+  });
+
+  document.getElementById("qb-measure1").addEventListener("click", function(){
+    var o = qbMeasureOnce();
+    qbLast.textContent = "|" + o + "⟩";
+    qbRenderTally();
+  });
+  document.getElementById("qb-measure10").addEventListener("click", function(){
+    var o; for (var i=0;i<10;i++) o = qbMeasureOnce();
+    qbLast.textContent = "|" + o + "⟩ (10회 일괄)";
+    qbRenderTally();
+  });
+  document.getElementById("qb-measure100").addEventListener("click", function(){
+    var o; for (var i=0;i<100;i++) o = qbMeasureOnce();
+    qbLast.textContent = "|" + o + "⟩ (100회 일괄)";
+    qbRenderTally();
+  });
+  document.getElementById("qb-reset").addEventListener("click", function(){
+    qbTally = {total:0,c0:0,c1:0};
+    qbLog.innerHTML = "";
+    qbLast.textContent = "—";
+    qbRenderTally();
+  });
+
+  qbCompute(); qbDrawVector(); qbRenderProbs(); qbRenderTally();
+
+  window.addEventListener("resize", debounce(function(){
+    // keep internal resolution fixed (set via width/height attrs); just redraw
+    qbDrawVector();
+  }, 200));
+
+  /* ================= 03. 이중슬릿 ================= */
+  var dsCanvas = document.getElementById("ds-canvas");
+  var dsCtx = dsCanvas.getContext("2d");
+  var dsBlockChk = document.getElementById("ds-block");
+  var dsCountLabel = document.getElementById("ds-count-label");
+  var dsModeLabel = document.getElementById("ds-mode-label");
+
+  var DS_W = dsCanvas.width, DS_H = dsCanvas.height;
+  var DS_EMIT_X = 46, DS_BARRIER_X = DS_W*0.42, DS_SCREEN_X = DS_W - 60;
+  var DS_BINS = 90;
+  var dsBins = new Array(DS_BINS).fill(0);
+  var dsTotal = 0;
+  var dsCdf = null, dsCdfBlocked = null;
+
+  function sinc(x){ if (Math.abs(x) < 1e-6) return 1; var px = Math.PI*x; return Math.sin(px)/px; }
+  function dsBuildCdf(blocked){
+    var N = 600, weights = new Array(N), sum = 0;
+    for (var i=0;i<N;i++){
+      var u = -1 + 2*i/(N-1);
+      var env = Math.pow(sinc(u*3.1), 2);
+      var w;
+      if (blocked){ w = env; }
+      else { w = env * Math.pow(Math.cos(u*9*Math.PI/2), 2); }
+      weights[i] = w; sum += w;
+    }
+    var cdf = new Array(N); var acc = 0;
+    for (var j=0;j<N;j++){ acc += weights[j]/sum; cdf[j] = acc; }
+    return cdf;
+  }
+  dsCdf = dsBuildCdf(false);
+  dsCdfBlocked = dsBuildCdf(true);
+
+  function dsSampleU(blocked){
+    var cdf = blocked ? dsCdfBlocked : dsCdf;
+    var r = Math.random();
+    var lo=0, hi=cdf.length-1;
+    while (lo < hi){ var mid=(lo+hi)>>1; if (cdf[mid] < r) lo = mid+1; else hi = mid; }
+    var N = cdf.length;
+    var u = -1 + 2*lo/(N-1);
+    u += (Math.random()-0.5) * (2/N);
+    return Math.max(-1, Math.min(1, u));
+  }
+
+  function dsDrawStatic(){
+    dsCtx.fillStyle = "#0a0f1a"; dsCtx.fillRect(0,0,DS_W,DS_H);
+    dsCtx.strokeStyle = "rgba(255,255,255,.08)"; dsCtx.lineWidth=1;
+    for (var y=20; y<DS_H; y+=30){ dsCtx.beginPath(); dsCtx.moveTo(0,y); dsCtx.lineTo(DS_W,y); dsCtx.stroke(); }
+
+    // emitter
+    dsCtx.fillStyle = "#ffb648";
+    dsCtx.beginPath(); dsCtx.arc(DS_EMIT_X, DS_H/2, 6, 0, Math.PI*2); dsCtx.fill();
+    dsCtx.fillStyle = "#cfe0ee"; dsCtx.font = "11px ui-monospace, monospace";
+    dsCtx.fillText("발생원", DS_EMIT_X-20, DS_H/2+24);
+
+    // barrier
+    var blocked = dsBlockChk.checked;
+    var gapH = 26, gapCenter1 = DS_H/2 - 34, gapCenter2 = DS_H/2 + 34;
+    dsCtx.strokeStyle = "#8a97ab"; dsCtx.lineWidth = 5;
+    dsCtx.beginPath();
+    dsCtx.moveTo(DS_BARRIER_X, 0); dsCtx.lineTo(DS_BARRIER_X, gapCenter1-gapH/2); dsCtx.stroke();
+    if (blocked){
+      dsCtx.beginPath();
+      dsCtx.moveTo(DS_BARRIER_X, gapCenter1-gapH/2); dsCtx.lineTo(DS_BARRIER_X, gapCenter2+gapH/2); dsCtx.stroke();
+    } else {
+      dsCtx.beginPath();
+      dsCtx.moveTo(DS_BARRIER_X, gapCenter1+gapH/2); dsCtx.lineTo(DS_BARRIER_X, gapCenter2-gapH/2); dsCtx.stroke();
+    }
+    dsCtx.beginPath();
+    dsCtx.moveTo(DS_BARRIER_X, gapCenter2+gapH/2); dsCtx.lineTo(DS_BARRIER_X, DS_H); dsCtx.stroke();
+
+    // screen
+    dsCtx.strokeStyle = "#5c6e86"; dsCtx.lineWidth = 1.5;
+    dsCtx.beginPath(); dsCtx.moveTo(DS_SCREEN_X, 0); dsCtx.lineTo(DS_SCREEN_X, DS_H); dsCtx.stroke();
+    dsCtx.fillStyle = "#cfe0ee"; dsCtx.fillText("스크린", DS_SCREEN_X-14, DS_H-6);
+  }
+
+  function dsPlotU(u){
+    var y = DS_H/2 + u * (DS_H*0.46);
+    var x = DS_SCREEN_X + 6 + Math.random()*10;
+    dsCtx.globalAlpha = 0.3;
+    dsCtx.fillStyle = "#45d6c6";
+    dsCtx.beginPath(); dsCtx.arc(x, y, 1.8, 0, Math.PI*2); dsCtx.fill();
+    dsCtx.globalAlpha = 1;
+  }
+
+  function dsRedrawFromBins(){
+    dsDrawStatic();
+    for (var i=0;i<DS_BINS;i++){
+      var count = dsBins[i];
+      if (!count) continue;
+      var uLo = -1 + 2*i/DS_BINS, uHi = -1 + 2*(i+1)/DS_BINS;
+      for (var k=0;k<count;k++){
+        var u = uLo + Math.random()*(uHi-uLo);
+        dsPlotU(u);
+      }
+    }
+  }
+
+  function dsFire(n){
+    var blocked = dsBlockChk.checked;
+    for (var i=0;i<n;i++){
+      var u = dsSampleU(blocked);
+      var bin = Math.floor((u+1)/2*DS_BINS);
+      if (bin<0) bin=0; if (bin>=DS_BINS) bin=DS_BINS-1;
+      dsBins[bin]++;
+      dsPlotU(u);
+    }
+    dsTotal += n;
+    dsCountLabel.textContent = "N = " + dsTotal.toLocaleString("ko-KR");
+  }
+
+  function dsReset(){
+    dsBins = new Array(DS_BINS).fill(0);
+    dsTotal = 0;
+    dsCountLabel.textContent = "N = 0";
+    dsDrawStatic();
+  }
+
+  dsBlockChk.addEventListener("change", function(){
+    dsModeLabel.textContent = dsBlockChk.checked ? "DOUBLE SLIT · ONE BLOCKED" : "DOUBLE SLIT · OPEN";
+    dsReset();
+  });
+  document.getElementById("ds-fire1").addEventListener("click", function(){ dsFire(1); });
+  document.getElementById("ds-fire10").addEventListener("click", function(){ dsFire(10); });
+  document.getElementById("ds-fire100").addEventListener("click", function(){ dsFire(100); });
+  document.getElementById("ds-fire10000").addEventListener("click", function(){ dsFire(10000); });
+  document.getElementById("ds-reset").addEventListener("click", dsReset);
+
+  dsDrawStatic();
+  window.addEventListener("resize", debounce(dsRedrawFromBins, 250));
+
+  /* ================= 04. 얽힘 ================= */
+  var entTotalLabel = document.getElementById("ent-total-label");
+  var entLog = document.getElementById("ent-log");
+  var entCounts = {"00":0,"01":0,"10":0,"11":0};
+  var entTotal = 0;
+
+  function entRenderTable(){
+    document.getElementById("ent-00").textContent = entCounts["00"];
+    document.getElementById("ent-01").textContent = entCounts["01"];
+    document.getElementById("ent-10").textContent = entCounts["10"];
+    document.getElementById("ent-11").textContent = entCounts["11"];
+    entTotalLabel.textContent = "시행 " + entTotal.toLocaleString("ko-KR") + "회";
+  }
+  function entAddChip(a,b){
+    var span = document.createElement("span");
+    span.className = "chip";
+    span.innerHTML = 'A:<span class="a">'+a+'</span> B:<span class="b">'+b+'</span>';
+    entLog.appendChild(span);
+    while (entLog.children.length > 20) entLog.removeChild(entLog.firstChild);
+  }
+  function entRun(n){
+    var a,b;
+    for (var i=0;i<n;i++){
+      a = Math.random() < 0.5 ? 0 : 1;
+      b = 1 - a; // 항상 반대 값 (단순화된 완전 반상관 모형)
+      entCounts[""+a+b]++;
+      entTotal++;
+      entAddChip(a,b);
+    }
+    entRenderTable();
+  }
+  document.getElementById("ent-run1").addEventListener("click", function(){ entRun(1); });
+  document.getElementById("ent-run10").addEventListener("click", function(){ entRun(10); });
+  document.getElementById("ent-run100").addEventListener("click", function(){ entRun(100); });
+  document.getElementById("ent-reset").addEventListener("click", function(){
+    entCounts = {"00":0,"01":0,"10":0,"11":0}; entTotal = 0; entLog.innerHTML = "";
+    entRenderTable();
+  });
+  entRenderTable();
+
+  /* ================= 05. 해석 논쟁 · 저장 ================= */
+  var LS_KEY = "qubit_reflect_log_v1";
+  var reflectBefore = document.getElementById("reflect-before");
+  var reflectAfter = document.getElementById("reflect-after");
+  var reflectStatus = document.getElementById("reflect-status");
+  var reflectLog = document.getElementById("reflect-log");
+
+  function loadReflections(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+  function renderReflections(){
+    var list = loadReflections();
+    reflectLog.innerHTML = "";
+    list.slice().reverse().slice(0,5).forEach(function(item){
+      var div = document.createElement("div");
+      div.className = "entry";
+      var d = new Date(item.t);
+      div.innerHTML = "<time>" + d.toLocaleString("ko-KR") + "</time>" +
+        "<div><strong>전에는</strong> " + escapeHtml(item.before || "(비어 있음)") + "</div>" +
+        "<div style='margin-top:.3em;'><strong>지금은</strong> " + escapeHtml(item.after || "(비어 있음)") + "</div>";
+      reflectLog.appendChild(div);
+    });
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  document.getElementById("reflect-save").addEventListener("click", function(){
+    var before = reflectBefore.value.trim(), after = reflectAfter.value.trim();
+    if (!before && !after){
+      reflectStatus.textContent = "내용을 입력한 뒤 저장해 주세요.";
+      return;
+    }
+    var list = loadReflections();
+    list.push({t: Date.now(), before: before, after: after});
+    try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch(e){}
+    reflectStatus.textContent = "저장했습니다. (이 브라우저에만 보관됩니다)";
+    renderReflections();
+  });
+  renderReflections();
+
+  /* ================= 유틸 ================= */
+  function debounce(fn, ms){
+    var t; return function(){ clearTimeout(t); var args=arguments, ctx=this; t=setTimeout(function(){ fn.apply(ctx,args); }, ms); };
+  }
+
+  /* ================= 사이드 네비 활성화 ================= */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll("#navdots a"));
+  var sections = ["s1","s2","s3","s4","s5","s6"].map(function(id){ return document.getElementById(id); });
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          var idx = sections.indexOf(e.target);
+          navLinks.forEach(function(a,i){ a.classList.toggle("active", i===idx); });
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+    sections.forEach(function(s){ if (s) io.observe(s); });
+  }
+})();
+</script>
