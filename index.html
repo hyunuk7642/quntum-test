@@ -246,7 +246,17 @@
   }
   .reflect .two{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
   @media (max-width:640px){ .reflect .two{ grid-template-columns:1fr; } }
-  .reflect .actions{ margin-top:1rem; display:flex; gap:.6rem; align-items:center; }
+  .reflect .actions{ margin-top:1rem; display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+  .reflect input[type="text"]{
+    width:100%; border-radius:var(--radius-sm); border:1px solid var(--border);
+    background:var(--bg-soft); color:var(--text); padding:.6em .8em; font-size:.9rem;
+  }
+  .reflect .idrow{
+    display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1.4fr; gap:.7rem; margin-bottom:1.2rem;
+    padding-bottom:1.2rem; border-bottom:1px dashed var(--border);
+  }
+  @media (max-width:640px){ .reflect .idrow{ grid-template-columns:1fr 1fr; } }
+  .reflect .idrow label{ font-size:.75rem; }
   .savedlog{ margin-top:1.2rem; border-top:1px dashed var(--border); padding-top:1rem; display:flex; flex-direction:column; gap:.7rem; }
   .savedlog .entry{ font-size:.88rem; color:var(--text-soft); background:var(--bg-soft); border-radius:8px; padding:.7em .9em; }
   .savedlog .entry time{ display:block; font-family:var(--font-mono); font-size:.7rem; color:var(--text-faint); margin-bottom:.3em; }
@@ -492,6 +502,28 @@
       </div>
       <div class="reflect">
         <div class="eyebrow" style="margin-bottom:.9rem;">나의 입장 정리하기</div>
+        <div class="idrow">
+          <div>
+            <label for="reflect-school">학교</label>
+            <input type="text" id="reflect-school" placeholder="예: 서울고등학교" autocomplete="off" />
+          </div>
+          <div>
+            <label for="reflect-grade">학년</label>
+            <input type="text" id="reflect-grade" placeholder="예: 2" autocomplete="off" />
+          </div>
+          <div>
+            <label for="reflect-class">반</label>
+            <input type="text" id="reflect-class" placeholder="예: 3" autocomplete="off" />
+          </div>
+          <div>
+            <label for="reflect-number">번호</label>
+            <input type="text" id="reflect-number" placeholder="예: 15" autocomplete="off" />
+          </div>
+          <div>
+            <label for="reflect-name">이름</label>
+            <input type="text" id="reflect-name" placeholder="예: 홍길동" autocomplete="off" />
+          </div>
+        </div>
         <div class="two">
           <div>
             <label for="reflect-before">나는 전에는…</label>
@@ -996,6 +1028,15 @@
 
   /* ================= 05. 해석 논쟁 · 저장 ================= */
   var LS_KEY = "qubit_reflect_log_v1";
+  var LS_ID_KEY = "qubit_reflect_identity_v1";
+  var SUPABASE_URL = "https://zvdozshnwtfwthuotynb.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_fn84m-fNZGN9kJ4o1wRo0Q_GkVov5-g";
+
+  var reflectSchool = document.getElementById("reflect-school");
+  var reflectGrade = document.getElementById("reflect-grade");
+  var reflectClass = document.getElementById("reflect-class");
+  var reflectNumber = document.getElementById("reflect-number");
+  var reflectName = document.getElementById("reflect-name");
   var reflectBefore = document.getElementById("reflect-before");
   var reflectAfter = document.getElementById("reflect-after");
   var reflectStatus = document.getElementById("reflect-status");
@@ -1005,6 +1046,11 @@
     try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
     catch(e){ return []; }
   }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
   function renderReflections(){
     var list = loadReflections();
     reflectLog.innerHTML = "";
@@ -1012,28 +1058,76 @@
       var div = document.createElement("div");
       div.className = "entry";
       var d = new Date(item.t);
-      div.innerHTML = "<time>" + d.toLocaleString("ko-KR") + "</time>" +
+      var who = [item.school, item.grade && (item.grade+"학년"), item.class && (item.class+"반"), item.number && (item.number+"번"), item.name]
+        .filter(Boolean).join(" · ");
+      div.innerHTML = "<time>" + d.toLocaleString("ko-KR") + (who ? " · " + escapeHtml(who) : "") + "</time>" +
         "<div><strong>전에는</strong> " + escapeHtml(item.before || "(비어 있음)") + "</div>" +
         "<div style='margin-top:.3em;'><strong>지금은</strong> " + escapeHtml(item.after || "(비어 있음)") + "</div>";
       reflectLog.appendChild(div);
     });
   }
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, function(c){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-    });
+  function loadSavedIdentity(){
+    try { return JSON.parse(localStorage.getItem(LS_ID_KEY) || "null"); }
+    catch(e){ return null; }
   }
+  (function prefillIdentity(){
+    var id = loadSavedIdentity();
+    if (!id) return;
+    reflectSchool.value = id.school || "";
+    reflectGrade.value = id.grade || "";
+    reflectClass.value = id.class || "";
+    reflectNumber.value = id.number || "";
+    reflectName.value = id.name || "";
+  })();
+
   document.getElementById("reflect-save").addEventListener("click", function(){
+    var identity = {
+      school: reflectSchool.value.trim(),
+      grade: reflectGrade.value.trim(),
+      class: reflectClass.value.trim(),
+      number: reflectNumber.value.trim(),
+      name: reflectName.value.trim()
+    };
     var before = reflectBefore.value.trim(), after = reflectAfter.value.trim();
+    if (!identity.school || !identity.grade || !identity.class || !identity.number || !identity.name){
+      reflectStatus.textContent = "학교·학년·반·번호·이름을 모두 입력해 주세요.";
+      return;
+    }
     if (!before && !after){
       reflectStatus.textContent = "내용을 입력한 뒤 저장해 주세요.";
       return;
     }
+
+    // 이 브라우저에 즉시 기록 (네트워크 상태와 무관하게 항상 보존)
     var list = loadReflections();
-    list.push({t: Date.now(), before: before, after: after});
+    list.push({ t: Date.now(), before: before, after: after,
+      school: identity.school, grade: identity.grade, class: identity.class, number: identity.number, name: identity.name });
     try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch(e){}
-    reflectStatus.textContent = "저장했습니다. (이 브라우저에만 보관됩니다)";
+    try { localStorage.setItem(LS_ID_KEY, JSON.stringify(identity)); } catch(e){}
     renderReflections();
+
+    reflectStatus.textContent = "저장하는 중…";
+    fetch(SUPABASE_URL + "/rest/v1/reflections", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        topic: "qubit_quantum_intro",
+        school: identity.school, grade: identity.grade, class: identity.class,
+        student_number: identity.number, student_name: identity.name,
+        before_text: before || null, after_text: after || null
+      })
+    }).then(function(res){
+      reflectStatus.textContent = res.ok
+        ? "선생님 서버에 저장되었습니다. (이 브라우저에도 함께 보관됩니다)"
+        : "이 브라우저에는 저장했지만, 서버 전송에 실패했습니다. 다시 눌러 주세요.";
+    }).catch(function(){
+      reflectStatus.textContent = "이 브라우저에는 저장했지만, 서버 전송에 실패했습니다(네트워크 확인). 다시 눌러 주세요.";
+    });
   });
   renderReflections();
 
