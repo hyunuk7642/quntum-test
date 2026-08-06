@@ -14,13 +14,13 @@
     --font-display:var(--font-body);
     --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,"Noto Sans Mono CJK KR",monospace;
 
-    --scope-bg:#0a0f1a;
-    --scope-grid:rgba(255,255,255,.07);
-    --scope-teal:#45d6c6;
-    --scope-violet:#a394f2;
-    --scope-amber:#ffb648;
-    --scope-text:#cfe0ee;
-    --scope-dim:#5c6e86;
+    --scope-bg:#ffffff;
+    --scope-grid:rgba(0,0,0,.06);
+    --scope-teal:#0066cc;
+    --scope-violet:#6e7681;
+    --scope-amber:#0066cc;
+    --scope-text:#1d1d1f;
+    --scope-dim:#6e6e73;
     --measure:#b5720c;
     --measure-soft:rgba(181,114,12,.14);
 
@@ -144,8 +144,8 @@
 
   /* ---------- 계기판(스코프) 패널 : 라이트/다크 상관없이 항상 어두운 평면 카드(제품 사진처럼 그림자를 지닌 유일한 요소) ---------- */
   .scope{
-    background:var(--scope-bg); border-radius:var(--radius); box-shadow:0 3px 30px rgba(0,0,0,.22);
-    border:1px solid rgba(255,255,255,.08); padding:clamp(1.1rem,2.5vw,1.6rem);
+    background:var(--scope-bg); border-radius:var(--radius); box-shadow:0 3px 30px rgba(0,0,0,.12);
+    border:1px solid rgba(0,0,0,.08); padding:clamp(1.1rem,2.5vw,1.6rem);
     color:var(--scope-text); position:relative;
   }
   .scope-head{
@@ -169,13 +169,11 @@
   .scope .btn{
     font-family:var(--font-mono); font-size:.82rem; letter-spacing:.02em; font-weight:600;
     padding:.6em 1.05em; border-radius:8px;
-    background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:var(--scope-text);
+    background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.12); color:var(--scope-text);
   }
-  .scope .btn:hover{ border-color:var(--scope-teal); background:rgba(255,255,255,.06); }
-  .scope .btn-primary{ background:var(--scope-teal); border-color:var(--scope-teal); color:#04231f; }
+  .scope .btn:hover{ border-color:var(--scope-teal); background:rgba(0,0,0,.05); }
+  .scope .btn-primary{ background:var(--scope-teal); border-color:var(--scope-teal); color:var(--scope-bg); }
   .scope .btn-primary:hover{ background:var(--scope-teal); filter:brightness(1.08); }
-  .scope .btn-amber{ background:transparent; border-color:var(--scope-amber); color:var(--scope-amber); }
-  .scope .btn-amber:hover{ background:rgba(255,182,72,.12); }
 
   .readout{ font-family:var(--font-mono); }
   .readout .big{ font-size:1.9rem; font-weight:700; color:var(--scope-teal); }
@@ -190,29 +188,29 @@
   /* ---------- 확률 바 ---------- */
   .probbar-row{ display:flex; align-items:center; gap:.8rem; margin-top:.7rem; }
   .probbar-label{ font-family:var(--font-mono); font-size:.85rem; width:3.4em; flex-shrink:0; }
-  .probbar-track{ flex:1; height:14px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; position:relative; }
+  .probbar-track{ flex:1; height:14px; background:rgba(0,0,0,.08); border-radius:99px; overflow:hidden; position:relative; }
   .probbar-fill{ height:100%; border-radius:99px; transition:width .35s ease; }
   .probbar-val{ font-family:var(--font-mono); font-size:.85rem; width:3.6em; text-align:right; flex-shrink:0; }
 
   /* ---------- 큰 숫자 표시(지수 벽) ---------- */
   .bignum-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:.4rem; }
-  .bignum{ font-family:var(--font-mono); font-size:clamp(1rem,3vw,1.5rem); white-space:nowrap; color:var(--scope-amber); font-weight:600; }
-  .bar-meter{ height:10px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:.6rem; }
+  .bignum{ font-family:var(--font-mono); font-size:clamp(1rem,3vw,1.5rem); white-space:nowrap; color:var(--scope-teal); font-weight:600; }
+  .bar-meter{ height:10px; border-radius:99px; background:rgba(0,0,0,.08); overflow:hidden; margin-top:.6rem; }
   .bar-meter > i{ display:block; height:100%; background:linear-gradient(90deg,var(--scope-teal),var(--scope-violet)); border-radius:99px; transition:width .25s ease; }
 
   /* ---------- 테이블 ---------- */
   .tablewrap{ overflow-x:auto; margin-top:.8rem; }
   table.xtab{ border-collapse:collapse; font-family:var(--font-mono); font-size:.85rem; min-width:320px; }
-  table.xtab th, table.xtab td{ border:1px solid rgba(255,255,255,.12); padding:.55em .9em; text-align:center; }
-  table.xtab th{ color:var(--scope-dim); font-weight:600; background:rgba(255,255,255,.03); }
-  table.xtab td.hot{ color:var(--scope-amber); font-weight:700; }
+  table.xtab th, table.xtab td{ border:1px solid rgba(0,0,0,.12); padding:.55em .9em; text-align:center; }
+  table.xtab th{ color:var(--scope-dim); font-weight:600; background:rgba(0,0,0,.03); }
+  table.xtab td.hot{ color:var(--scope-teal); font-weight:700; }
   table.xtab td.cold{ color:var(--scope-dim); }
 
   .chiprow{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem; }
   .chip{ font-family:var(--font-mono); font-size:.72rem; padding:.3em .55em; border-radius:6px; display:inline-flex; gap:.3em; align-items:center; }
   .chip .a{ color:var(--scope-teal); }
   .chip .b{ color:var(--scope-violet); }
-  .chip{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  .chip{ background:rgba(0,0,0,.04); border:1px solid rgba(0,0,0,.08); }
 
   /* ---------- 카드 (하드라인 테두리만, 그림자 없음 — Apple 규칙) ---------- */
   .cardgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.1rem; margin-top:1.4rem; }
@@ -366,7 +364,7 @@
         <button class="btn btn-primary" id="qb-measure1">측정하기 ×1</button>
         <button class="btn" id="qb-measure10">×10</button>
         <button class="btn" id="qb-measure100">×100</button>
-        <button class="btn btn-amber" id="qb-reset">초기화</button>
+        <button class="btn" id="qb-reset">초기화</button>
       </div>
       <div class="readout" style="margin-top:1rem;">
         <div class="kv"><span>마지막 측정 결과</span><span class="tabular" id="qb-lastresult">—</span></div>
@@ -391,7 +389,7 @@
   <div class="grid2">
     <div class="prose">
       <p>입자(광자·전자 등)를 한 번에 하나씩 두 개의 슬릿을 향해 쏩니다. 각 입자가 스크린의 어디에 도착할지는 예측할 수 없지만, 수많은 입자가 쌓이면 밝고 어두운 줄무늬 &mdash; 간섭무늬 &mdash; 가 나타납니다. 이는 입자 하나하나가 마치 파동처럼 두 슬릿을 동시에 &ldquo;지나가며&rdquo; 스스로와 간섭한 결과로 해석됩니다.</p>
-      <p><strong>한쪽 슬릿을 막아보세요.</strong> 어느 슬릿을 지났는지 알 수 있게(경로 정보 확보) 되는 순간, 간섭무늬는 사라지고 평범한 하나의 뭉치(단일슬릿 회절 패턴)만 남습니다. 측정(경로 확인)이 중첩을 무너뜨린다는 것을 보여주는 대표적인 예시입니다.</p>
+      <p><strong>&ldquo;경로 측정&rdquo;을 눌러보세요.</strong> 이번엔 슬릿을 물리적으로 막지 않습니다 &mdash; 두 슬릿을 모두 열어 둔 채로, 입자가 어느 슬릿을 지나는지만 살짝 &ldquo;확인&rdquo;합니다. 그 결과 화면에는 두 슬릿 각각의 위치를 중심으로 한 두 개의 뭉치가 겹쳐서 나타납니다 &mdash; 좁은 두 개의 선이 아니라 뭉툭한 두 언덕인 이유는, 경로를 알아도 입자는 여전히 파동처럼 슬릿에서 회절하며 퍼지기 때문입니다. 반면 <strong>&ldquo;한쪽 슬릿 막기&rdquo;</strong>는 남은 슬릿 하나의 회절 무늬만 그 슬릿 쪽으로 치우쳐 나타납니다. 두 조건의 전체 모양은 이렇게 다르지만, 공통점이 하나 있습니다: 어느 쪽이든 <strong>가늘고 촘촘한 간섭 줄무늬만큼은 완전히 사라진다</strong>는 것입니다. 슬릿을 막아서 경로 정보를 얻든, 막지 않고 측정으로 얻든 &mdash; 간섭 그 자체를 무너뜨리는 것은 &ldquo;막았는가&rdquo;가 아니라 &ldquo;알게 되었는가&rdquo;입니다.</p>
       <p><strong>주의할 점.</strong> 화면 위 각 점은 &ldquo;입자가 파동이면서 동시에 입자&rdquo;라는 것을 낱장으로 보여주는 것이 아니라, 측정은 언제나 하나의 위치에서 하나의 결과로만 일어난다는 것을 보여줍니다. 파동적 성질은 그 결과들이 쌓였을 때의 확률 분포로만 드러납니다.</p>
     </div>
     <div class="scope">
@@ -402,14 +400,14 @@
         <button class="btn" id="ds-fire10">×10</button>
         <button class="btn" id="ds-fire100">×100</button>
         <button class="btn" id="ds-fire10000">×10,000</button>
-        <button class="btn btn-amber" id="ds-reset">초기화</button>
+        <button class="btn" id="ds-reset">초기화</button>
       </div>
-      <div class="scope-row" style="align-items:center;">
-        <label style="display:flex; align-items:center; gap:.5em; font-family:var(--font-mono); font-size:.82rem; color:var(--scope-text);">
-          <input type="checkbox" id="ds-block" style="accent-color:var(--scope-amber); width:1.1em; height:1.1em;" />
-          한쪽 슬릿 막기 (경로 정보 확보)
-        </label>
+      <div class="scope-row" role="group" aria-label="슬릿 조건 선택">
+        <button class="btn btn-primary" id="ds-mode-open" aria-pressed="true">간섭 (양쪽 열림)</button>
+        <button class="btn" id="ds-mode-measure" aria-pressed="false">경로 측정 (양쪽 열림)</button>
+        <button class="btn" id="ds-mode-block" aria-pressed="false">한쪽 슬릿 막기</button>
       </div>
+      <p id="ds-mode-desc" style="margin-top:.7rem; font-size:.8rem; color:var(--scope-dim); font-family:var(--font-mono);">두 슬릿 모두 열려 있고, 경로 정보를 얻지 않습니다 — 간섭무늬가 나타납니다.</p>
     </div>
   </div>
   </div>
@@ -446,7 +444,7 @@
         <button class="btn btn-primary" id="ent-run1">측정하기 ×1</button>
         <button class="btn" id="ent-run10">×10</button>
         <button class="btn" id="ent-run100">×100</button>
-        <button class="btn btn-amber" id="ent-reset">초기화</button>
+        <button class="btn" id="ent-reset">초기화</button>
       </div>
       <div class="tablewrap">
         <table class="xtab" id="ent-table">
@@ -658,35 +656,35 @@
   function qbDrawVector(){
     var w = qbCanvas.width, h = qbCanvas.height;
     qbCtx.clearRect(0,0,w,h);
-    qbCtx.fillStyle = "#0a0f1a"; qbCtx.fillRect(0,0,w,h);
+    qbCtx.fillStyle = "#ffffff"; qbCtx.fillRect(0,0,w,h);
     var ox = w*0.32, oy = h*0.85, R = Math.min(w,h)*0.5;
 
     // grid
-    qbCtx.strokeStyle = "rgba(255,255,255,.06)"; qbCtx.lineWidth = 1;
+    qbCtx.strokeStyle = "rgba(0,0,0,.08)"; qbCtx.lineWidth = 1;
     for (var g=1; g<=4; g++){
       qbCtx.beginPath(); qbCtx.arc(ox, oy, R*g/4, Math.PI, 1.5*Math.PI); qbCtx.stroke();
     }
     // axes
-    qbCtx.strokeStyle = "#5c6e86"; qbCtx.lineWidth = 1.5;
+    qbCtx.strokeStyle = "#6e6e73"; qbCtx.lineWidth = 1.5;
     qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(ox, oy-R-24); qbCtx.stroke();
     qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(ox+R+24, oy); qbCtx.stroke();
-    qbCtx.fillStyle = "#45d6c6"; qbCtx.font = "600 16px " + getMono();
+    qbCtx.fillStyle = "#0066cc"; qbCtx.font = "600 16px " + getMono();
     qbCtx.fillText("|0⟩", ox-8, oy-R-32);
-    qbCtx.fillStyle = "#a394f2";
+    qbCtx.fillStyle = "#6e7681";
     qbCtx.fillText("|1⟩", ox+R+30, oy+5);
 
     // angle arc
-    qbCtx.strokeStyle = "rgba(255,182,72,.6)"; qbCtx.lineWidth = 1.5;
+    qbCtx.strokeStyle = "rgba(0,102,204,.55)"; qbCtx.lineWidth = 1.5;
     qbCtx.beginPath(); qbCtx.arc(ox, oy, 36, -Math.PI/2, -Math.PI/2 + qbState.theta*Math.PI/180); qbCtx.stroke();
 
     // vector
     var vx = ox + qbState.beta * R;
     var vy = oy - qbState.alpha * R;
-    qbCtx.strokeStyle = "#ffb648"; qbCtx.lineWidth = 3; qbCtx.lineCap = "round";
+    qbCtx.strokeStyle = "#0066cc"; qbCtx.lineWidth = 3; qbCtx.lineCap = "round";
     qbCtx.beginPath(); qbCtx.moveTo(ox, oy); qbCtx.lineTo(vx, vy); qbCtx.stroke();
     // arrowhead
     var ang = Math.atan2(vy-oy, vx-ox);
-    qbCtx.fillStyle = "#ffb648";
+    qbCtx.fillStyle = "#0066cc";
     qbCtx.beginPath();
     qbCtx.moveTo(vx, vy);
     qbCtx.lineTo(vx - 10*Math.cos(ang-0.4), vy - 10*Math.sin(ang-0.4));
@@ -695,11 +693,11 @@
 
     // projections
     qbCtx.setLineDash([4,4]);
-    qbCtx.strokeStyle = "rgba(69,214,198,.55)";
+    qbCtx.strokeStyle = "rgba(0,102,204,.35)";
     qbCtx.beginPath(); qbCtx.moveTo(ox,oy); qbCtx.lineTo(ox, vy); qbCtx.moveTo(ox,vy); qbCtx.lineTo(vx,vy); qbCtx.stroke();
     qbCtx.setLineDash([]);
 
-    qbCtx.fillStyle = "#cfe0ee"; qbCtx.font = "13px " + getMono();
+    qbCtx.fillStyle = "#1d1d1f"; qbCtx.font = "13px " + getMono();
     qbCtx.fillText("α = " + qbState.alpha.toFixed(2), ox+8, (oy+vy)/2);
     qbCtx.fillText("β = " + qbState.beta.toFixed(2), (ox+vx)/2 - 14, vy - 10);
   }
@@ -774,37 +772,63 @@
   /* ================= 03. 이중슬릿 ================= */
   var dsCanvas = document.getElementById("ds-canvas");
   var dsCtx = dsCanvas.getContext("2d");
-  var dsBlockChk = document.getElementById("ds-block");
   var dsCountLabel = document.getElementById("ds-count-label");
   var dsModeLabel = document.getElementById("ds-mode-label");
+  var dsModeDesc = document.getElementById("ds-mode-desc");
+  var dsModeBtns = {
+    open: document.getElementById("ds-mode-open"),
+    measure: document.getElementById("ds-mode-measure"),
+    block: document.getElementById("ds-mode-block")
+  };
+  var dsMode = "open"; // "open" | "measure" | "block"
+  var DS_MODE_INFO = {
+    open:    { label: "DOUBLE SLIT · OPEN", desc: "두 슬릿 모두 열려 있고, 경로 정보를 얻지 않습니다 — 간섭무늬가 나타납니다." },
+    measure: { label: "DOUBLE SLIT · PATH MEASURED", desc: "두 슬릿 모두 열려 있지만, 입자가 지나는 슬릿을 측정합니다 — 물리적으로 막지 않아도 간섭무늬가 사라집니다." },
+    block:   { label: "DOUBLE SLIT · ONE BLOCKED", desc: "한쪽 슬릿을 물리적으로 막았습니다 — 남은 하나의 슬릿을 통과한 입자만 도착합니다." }
+  };
 
   var DS_W = dsCanvas.width, DS_H = dsCanvas.height;
   var DS_EMIT_X = 46, DS_BARRIER_X = DS_W*0.42, DS_SCREEN_X = DS_W - 60;
+  var DS_GAP_H = 26, DS_GAP1_Y = DS_H/2 - 46, DS_GAP2_Y = DS_H/2 + 46;
   var DS_BINS = 90;
   var dsBins = new Array(DS_BINS).fill(0);
   var dsTotal = 0;
-  var dsCdf = null, dsCdfBlocked = null;
+  // dsPlotU()의 y = DS_H/2 + u*(DS_H*0.46) 매핑과 짝을 맞춰, 슬릿의 실제 화면 위치를 u좌표로 환산한다.
+  var DS_U_OFFSET = (DS_GAP2_Y - DS_H/2) / (DS_H*0.46); // gap2(아래)는 +, gap1(위)은 -
+  var dsCdfOpen = null, dsCdfMeasure = null, dsCdfBlock = null;
 
   function sinc(x){ if (Math.abs(x) < 1e-6) return 1; var px = Math.PI*x; return Math.sin(px)/px; }
-  function dsBuildCdf(blocked){
+  // 슬릿 하나가 만드는 회절 무늬(단일슬릿 envelope). offset은 그 슬릿 자신의 정면 방향(=화면상 위치)에 중심을 맞춘다.
+  function singleSlitEnvelope(u, offset){ return Math.pow(sinc((u-offset)*3.1), 2); }
+
+  function dsBuildCdf(weightFn){
     var N = 600, weights = new Array(N), sum = 0;
     for (var i=0;i<N;i++){
       var u = -1 + 2*i/(N-1);
-      var env = Math.pow(sinc(u*3.1), 2);
-      var w;
-      if (blocked){ w = env; }
-      else { w = env * Math.pow(Math.cos(u*9*Math.PI/2), 2); }
+      var w = weightFn(u);
       weights[i] = w; sum += w;
     }
     var cdf = new Array(N); var acc = 0;
     for (var j=0;j<N;j++){ acc += weights[j]/sum; cdf[j] = acc; }
     return cdf;
   }
-  dsCdf = dsBuildCdf(false);
-  dsCdfBlocked = dsBuildCdf(true);
+  // 간섭(open): 두 슬릿에서 나온 확률진폭을 먼저 더한 뒤 제곱 → cos² 간섭항이 살아있다.
+  dsCdfOpen = dsBuildCdf(function(u){
+    return singleSlitEnvelope(u, 0) * Math.pow(Math.cos(u*9*Math.PI/2), 2);
+  });
+  // 경로 측정(measure): 두 슬릿 모두 열려 있지만 경로를 알고 있으므로, 각 슬릿이 "자기 위치"에 남기는
+  // 확률을 진폭이 아니라 확률(세기)로 더한다 → cos² 항은 사라지고, 두 슬릿 각각의 회절 무늬가
+  // 자신의 슬릿 정면(= 그 슬릿의 화면상 위치)에 중심을 둔 채 겹쳐서 남는다.
+  dsCdfMeasure = dsBuildCdf(function(u){
+    return singleSlitEnvelope(u, -DS_U_OFFSET) + singleSlitEnvelope(u, DS_U_OFFSET);
+  });
+  // 한쪽 슬릿 막기(block): 남은 슬릿(위쪽, gap1) 하나만의 회절 무늬 — 그 슬릿 자신의 위치에 중심이 있다.
+  dsCdfBlock = dsBuildCdf(function(u){
+    return singleSlitEnvelope(u, -DS_U_OFFSET);
+  });
 
-  function dsSampleU(blocked){
-    var cdf = blocked ? dsCdfBlocked : dsCdf;
+  function dsSampleU(mode){
+    var cdf = (mode === "open") ? dsCdfOpen : (mode === "measure") ? dsCdfMeasure : dsCdfBlock;
     var r = Math.random();
     var lo=0, hi=cdf.length-1;
     while (lo < hi){ var mid=(lo+hi)>>1; if (cdf[mid] < r) lo = mid+1; else hi = mid; }
@@ -814,44 +838,61 @@
     return Math.max(-1, Math.min(1, u));
   }
 
+  function dsDrawBarrier(){
+    // "구멍"만 뚫려 있는 곳을 제외하고 나머지를 벽으로 그린다 — 슬릿 개수에 상관없이 항상 정확한 벽 모양이 나온다.
+    var gap1Open = true;
+    var gap2Open = (dsMode !== "block");
+    var holes = [];
+    if (gap1Open) holes.push([DS_GAP1_Y - DS_GAP_H/2, DS_GAP1_Y + DS_GAP_H/2]);
+    if (gap2Open) holes.push([DS_GAP2_Y - DS_GAP_H/2, DS_GAP2_Y + DS_GAP_H/2]);
+    holes.sort(function(a,b){ return a[0]-b[0]; });
+
+    dsCtx.strokeStyle = "#8a8a8e"; dsCtx.lineWidth = 5;
+    var cursor = 0;
+    holes.forEach(function(h){
+      if (h[0] > cursor){ dsCtx.beginPath(); dsCtx.moveTo(DS_BARRIER_X, cursor); dsCtx.lineTo(DS_BARRIER_X, h[0]); dsCtx.stroke(); }
+      cursor = h[1];
+    });
+    if (cursor < DS_H){ dsCtx.beginPath(); dsCtx.moveTo(DS_BARRIER_X, cursor); dsCtx.lineTo(DS_BARRIER_X, DS_H); dsCtx.stroke(); }
+
+    // 측정 모드 : 열려 있는 슬릿마다 작은 "감지기"를 표시해, 막지 않고도 경로를 알 수 있음을 시각화한다.
+    if (dsMode === "measure"){
+      holes.forEach(function(h){
+        var cy = (h[0]+h[1])/2;
+        dsCtx.fillStyle = "rgba(0,102,204,.9)";
+        dsCtx.beginPath(); dsCtx.arc(DS_BARRIER_X - 16, cy, 4, 0, Math.PI*2); dsCtx.fill();
+        dsCtx.strokeStyle = "rgba(0,102,204,.5)"; dsCtx.lineWidth = 1;
+        dsCtx.beginPath(); dsCtx.arc(DS_BARRIER_X - 16, cy, 8, 0, Math.PI*2); dsCtx.stroke();
+      });
+      dsCtx.fillStyle = "#0066cc"; dsCtx.font = "11px ui-monospace, monospace";
+      dsCtx.fillText("감지기", DS_BARRIER_X - 40, DS_GAP1_Y - DS_GAP_H/2 - 10);
+    }
+  }
+
   function dsDrawStatic(){
-    dsCtx.fillStyle = "#0a0f1a"; dsCtx.fillRect(0,0,DS_W,DS_H);
-    dsCtx.strokeStyle = "rgba(255,255,255,.08)"; dsCtx.lineWidth=1;
+    dsCtx.fillStyle = "#ffffff"; dsCtx.fillRect(0,0,DS_W,DS_H);
+    dsCtx.strokeStyle = "rgba(0,0,0,.06)"; dsCtx.lineWidth=1;
     for (var y=20; y<DS_H; y+=30){ dsCtx.beginPath(); dsCtx.moveTo(0,y); dsCtx.lineTo(DS_W,y); dsCtx.stroke(); }
 
     // emitter
-    dsCtx.fillStyle = "#ffb648";
+    dsCtx.fillStyle = "#0066cc";
     dsCtx.beginPath(); dsCtx.arc(DS_EMIT_X, DS_H/2, 6, 0, Math.PI*2); dsCtx.fill();
-    dsCtx.fillStyle = "#cfe0ee"; dsCtx.font = "11px ui-monospace, monospace";
+    dsCtx.fillStyle = "#1d1d1f"; dsCtx.font = "11px ui-monospace, monospace";
     dsCtx.fillText("발생원", DS_EMIT_X-20, DS_H/2+24);
 
-    // barrier
-    var blocked = dsBlockChk.checked;
-    var gapH = 26, gapCenter1 = DS_H/2 - 34, gapCenter2 = DS_H/2 + 34;
-    dsCtx.strokeStyle = "#8a97ab"; dsCtx.lineWidth = 5;
-    dsCtx.beginPath();
-    dsCtx.moveTo(DS_BARRIER_X, 0); dsCtx.lineTo(DS_BARRIER_X, gapCenter1-gapH/2); dsCtx.stroke();
-    if (blocked){
-      dsCtx.beginPath();
-      dsCtx.moveTo(DS_BARRIER_X, gapCenter1-gapH/2); dsCtx.lineTo(DS_BARRIER_X, gapCenter2+gapH/2); dsCtx.stroke();
-    } else {
-      dsCtx.beginPath();
-      dsCtx.moveTo(DS_BARRIER_X, gapCenter1+gapH/2); dsCtx.lineTo(DS_BARRIER_X, gapCenter2-gapH/2); dsCtx.stroke();
-    }
-    dsCtx.beginPath();
-    dsCtx.moveTo(DS_BARRIER_X, gapCenter2+gapH/2); dsCtx.lineTo(DS_BARRIER_X, DS_H); dsCtx.stroke();
+    dsDrawBarrier();
 
     // screen
-    dsCtx.strokeStyle = "#5c6e86"; dsCtx.lineWidth = 1.5;
+    dsCtx.strokeStyle = "#6e6e73"; dsCtx.lineWidth = 1.5;
     dsCtx.beginPath(); dsCtx.moveTo(DS_SCREEN_X, 0); dsCtx.lineTo(DS_SCREEN_X, DS_H); dsCtx.stroke();
-    dsCtx.fillStyle = "#cfe0ee"; dsCtx.fillText("스크린", DS_SCREEN_X-14, DS_H-6);
+    dsCtx.fillStyle = "#1d1d1f"; dsCtx.fillText("스크린", DS_SCREEN_X-14, DS_H-6);
   }
 
   function dsPlotU(u){
     var y = DS_H/2 + u * (DS_H*0.46);
     var x = DS_SCREEN_X + 6 + Math.random()*10;
-    dsCtx.globalAlpha = 0.3;
-    dsCtx.fillStyle = "#45d6c6";
+    dsCtx.globalAlpha = 0.45;
+    dsCtx.fillStyle = "#0066cc";
     dsCtx.beginPath(); dsCtx.arc(x, y, 1.8, 0, Math.PI*2); dsCtx.fill();
     dsCtx.globalAlpha = 1;
   }
@@ -870,9 +911,8 @@
   }
 
   function dsFire(n){
-    var blocked = dsBlockChk.checked;
     for (var i=0;i<n;i++){
-      var u = dsSampleU(blocked);
+      var u = dsSampleU(dsMode);
       var bin = Math.floor((u+1)/2*DS_BINS);
       if (bin<0) bin=0; if (bin>=DS_BINS) bin=DS_BINS-1;
       dsBins[bin]++;
@@ -889,10 +929,22 @@
     dsDrawStatic();
   }
 
-  dsBlockChk.addEventListener("change", function(){
-    dsModeLabel.textContent = dsBlockChk.checked ? "DOUBLE SLIT · ONE BLOCKED" : "DOUBLE SLIT · OPEN";
+  function dsSetMode(mode){
+    dsMode = mode;
+    Object.keys(dsModeBtns).forEach(function(key){
+      var btn = dsModeBtns[key];
+      var active = (key === mode);
+      btn.classList.toggle("btn-primary", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+    dsModeLabel.textContent = DS_MODE_INFO[mode].label;
+    dsModeDesc.textContent = DS_MODE_INFO[mode].desc;
     dsReset();
-  });
+  }
+
+  dsModeBtns.open.addEventListener("click", function(){ dsSetMode("open"); });
+  dsModeBtns.measure.addEventListener("click", function(){ dsSetMode("measure"); });
+  dsModeBtns.block.addEventListener("click", function(){ dsSetMode("block"); });
   document.getElementById("ds-fire1").addEventListener("click", function(){ dsFire(1); });
   document.getElementById("ds-fire10").addEventListener("click", function(){ dsFire(10); });
   document.getElementById("ds-fire100").addEventListener("click", function(){ dsFire(100); });
